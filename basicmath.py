@@ -1,5 +1,6 @@
 import basicgates as bg
 
+
 class HalfAdder:
     def __init__(self, in_a=None, in_b=None):
         self.in_a = in_a
@@ -42,40 +43,14 @@ class FullAdder:
         self.in_b = in_b
         self.in_carry = in_carry
         self.HA1 = HalfAdder(in_a, in_b)
-        self.HA1_c = Connector(self.HA1, "carry")
-        self.HA1_s = Connector(self.HA1, "sum")
-        self.HA2 = HalfAdder(in_carry, self.HA1_s)
-        self.HA2_c = Connector(self.HA2, "carry")
-        self.HA2_s = Connector(self.HA2, "sum")
-        self.OR1 = bg.OR(self.HA1_c, self.HA2_c)
-
-    def update(self):
-        self.out_carry = self.OR1.is_on
-        self.out_sum = self.HA2_s.get_state()
-
-    def get_state(self, pout):
-        self.update()
-        if pout == "carry":
-            return self.out_carry
-        if pout == "sum":
-            return self.out_sum
-
-    def __str__(self):
-        self.update()
-        return str(int(self.out_carry)) + str(int(self.out_sum))
-
-class YFullAdder:
-    def __init__(self, in_a=None, in_b=None, in_carry=None):
-        self.in_a = in_a
-        self.in_b = in_b
-        self.in_carry = in_carry
-        self.HA1 = HalfAdder(in_a, in_b)
         self.HA2 = HalfAdder(in_carry, self.HA1.con_s)
         self.OR1 = bg.OR(self.HA1.con_c, self.HA2.con_c)
+        self.con_c = Connector(self, "carry")
+        self.con_s = Connector(self, "sum")
 
     def update(self):
         self.out_carry = self.OR1.is_on
-        self.out_sum = self.HA2.con_s.get_state()
+        self.out_sum = self.HA2.con_s.is_on
 
     def get_state(self, pout):
         self.update()
@@ -88,120 +63,107 @@ class YFullAdder:
         self.update()
         return str(int(self.out_carry)) + str(int(self.out_sum))
 
-class XFullAdder:
-    def __init__(self, in_a=None, in_b=None, in_carry=None):
-        self.in_a = in_a
-        self.in_b = in_b
-        self.in_carry = in_carry
-        self.HA1_c, self.HA1_s = make_half_adder(in_a, in_b)
-        self.HA2_c, self.HA2_s = make_half_adder(in_carry, self.HA1_s)
-        self.OR1 = bg.OR(self.HA1_c, self.HA2_c)
-
-    def update(self):
-        self.out_carry = self.OR1.is_on
-        self.out_sum = self.HA2_s.get_state()
-
-    def get_state(self, pout):
-        self.update()
-        if pout == "carry":
-            return self.out_carry
-        if pout == "sum":
-            return self.out_sum
-
-    def __str__(self):
-        self.update()
-        return str(int(self.out_carry)) + str(int(self.out_sum))
-
-
-def make_half_adder(in_a, in_b):
-    tmp = HalfAdder(in_a, in_b)
-    cc = Connector(tmp, "carry")
-    cs = Connector(tmp, "sum")
-    return cc, cs
 
 B0 = bg.Bit(False)
 B1 = bg.Bit(True)
 
 asd = HalfAdder(B0, B0)
 print(asd)
-asd = HalfAdder(B0, B1)
-print(asd)
-asd = HalfAdder(B1, B0)
-print(asd)
-asd = HalfAdder(B1, B1)
-print(asd)
+# asd = HalfAdder(B0, B1)
+# print(asd)
+# asd = HalfAdder(B1, B0)
+# print(asd)
+# asd = HalfAdder(B1, B1)
+# print(asd)
 
 
 asd = FullAdder(B0, B0, B0)
 print(asd)
 
-asd = FullAdder(B0, B0, B1)
-print(asd)
+# asd = FullAdder(B0, B0, B1)
+# print(asd)
 
-asd = FullAdder(B0, B1, B0)
-print(asd)
+# asd = FullAdder(B0, B1, B0)
+# print(asd)
 
-asd = FullAdder(B1, B0, B0)
-print(asd)
+# asd = FullAdder(B1, B0, B0)
+# print(asd)
 
-asd = FullAdder(B0, B1, B1)
-print(asd)
+# asd = FullAdder(B0, B1, B1)
+# print(asd)
 
-asd = FullAdder(B1, B0, B1)
-print(asd)
+# asd = FullAdder(B1, B0, B1)
+# print(asd)
 
-asd = FullAdder(B1, B1, B0)
-print(asd)
+# asd = FullAdder(B1, B1, B0)
+# print(asd)
 
-asd = FullAdder(B1, B1, B1)
-print(asd)
-
-
-asd = XFullAdder(B0, B0, B0)
-print(asd)
-
-asd = XFullAdder(B0, B0, B1)
-print(asd)
-
-asd = XFullAdder(B0, B1, B0)
-print(asd)
-
-asd = XFullAdder(B1, B0, B0)
-print(asd)
-
-asd = XFullAdder(B0, B1, B1)
-print(asd)
-
-asd = XFullAdder(B1, B0, B1)
-print(asd)
-
-asd = XFullAdder(B1, B1, B0)
-print(asd)
-
-asd = XFullAdder(B1, B1, B1)
-print(asd)
+# asd = FullAdder(B1, B1, B1)
+# print(asd)
 
 
-asd = YFullAdder(B0, B0, B0)
-print(asd)
+class Eight_Bit_Adder:
+    def __init__(self, in_a=None, in_b=None, in_carry=False):
+        self.in_a = in_a
+        self.in_b = in_b
+        self.a = [FullAdder(bg.Bit(bool(int(in_a.pop()))), bg.Bit(
+            bool(int(in_b.pop()))), bg.Bit(in_carry))]
+        for i in range(1, 6):
+            self.a.append(FullAdder(bg.Bit(bool(int(in_a.pop()))),
+                          bg.Bit(bool(int(in_b.pop()))), self.a[i-1].con_c))
 
-asd = YFullAdder(B0, B0, B1)
-print(asd)
+    def update(self):
+        # lsb first
+        self.out = [y.con_s.is_on for y in self.a] + [self.a[-1].con_c.is_on]
 
-asd = YFullAdder(B0, B1, B0)
-print(asd)
+    def __str__(self):
+        self.update()
+        bitlist = [str(int(b)) for b in self.out][::-1]
+        #bitlist.reverse()
+        return ''.join(bitlist)
 
-asd = YFullAdder(B1, B0, B0)
-print(asd)
+qwe = Eight_Bit_Adder(list('00001111'), list('00001111'))
+cProfile.run('print(qwe.a[0])')
+cProfile.run('print(qwe.a[1])')
+cProfile.run('print(qwe.a[2])')
+cProfile.run('print(qwe.a[3])')
 
-asd = YFullAdder(B0, B1, B1)
-print(asd)
+qwe = Eight_Bit_Adder(list('00000001'), list('00000001'))
+print(qwe)
 
-asd = YFullAdder(B1, B0, B1)
-print(asd)
 
-asd = YFullAdder(B1, B1, B0)
-print(asd)
+qwe = Eight_Bit_Adder(list('111111'), list('111111'))
+print(qwe)
 
-asd = YFullAdder(B1, B1, B1)
-print(asd)
+qwe = Eight_Bit_Adder(list('00000001'), list('00000001'))
+print(qwe)
+
+
+qwe = Eight_Bit_Adder(list('11111111'), list('11111111'))
+
+print(qwe)
+qwe = Eight_Bit_Adder(list('00000001'), list('00000001'))
+print(qwe)
+
+
+qwe = Eight_Bit_Adder(list('11111111'), list('11111111'))
+print(qwe)
+qwe = Eight_Bit_Adder(list('00000001'), list('00000001'))
+print(qwe)
+
+
+qwe = Eight_Bit_Adder(list('11111111'), list('11111111'))
+print(qwe)
+
+def phelp():
+    fg = Eight_Bit_Adder(list('11111111'), list('11111111'))
+    print(fg)
+
+phelp()
+
+# todo 16Bitadder
+
+import cProfile
+cProfile.run('print(qwe)')
+
+# performance scheiße weil für jedes bit wieder alles geupdatet wird

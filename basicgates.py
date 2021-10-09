@@ -1,6 +1,6 @@
 class Bit:
-    def __init__(self, is_on=False):
-        self.out = is_on
+    def __init__(self, active=False):
+        self.out = active
 
     def get_state(self):
         return self.out
