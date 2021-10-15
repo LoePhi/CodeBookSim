@@ -1,10 +1,12 @@
-from basic_components import ElectricComponent, SingleStateComponent, Switch, LooseWire
+from component import ElectricComponent
+from basemethods import unpack_io
+from singlestatecomp import SingleStateComponent, Switch, LooseWire
 
 
 class INV(SingleStateComponent):
     """Inverts the input"""
 
-    inputs = ('in_a', )
+    inputs = unpack_io('in_a', )
 
     def __init__(self, in_a: ElectricComponent = LooseWire()):
         self.in_a = in_a
@@ -22,7 +24,7 @@ class LogicGate(SingleStateComponent):
     Logic Gates have two inputs (in_a, in_b) connected to a single output
     """
 
-    inputs = ('in_a', 'in_b')
+    inputs = unpack_io('in_a', 'in_b')
 
     def __init__(self, in_a: ElectricComponent = LooseWire(), in_b: ElectricComponent = LooseWire()):
         self.in_a = in_a

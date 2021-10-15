@@ -1,12 +1,14 @@
-from basic_components import ElectricComponent, Switch, Connector, LooseWire
+from component import ElectricComponent
+from basemethods import unpack_io
+from singlestatecomp import Switch, Connector, LooseWire
 from logicgates import AND, OR, XOR
-from utility_functions import bts8
+from helpers import bts8
 
 
 class HalfAdder(ElectricComponent):
 
-    inputs = ('in_a', 'in_b')
-    outputs = ('out_carry', 'out_sum')
+    inputs = unpack_io('in_a', 'in_b')
+    outputs = unpack_io('out_carry', 'out_sum')
 
     def __init__(self, in_a: ElectricComponent = LooseWire(), in_b: ElectricComponent = LooseWire()):
         self.in_a = in_a
@@ -40,8 +42,8 @@ class HalfAdder(ElectricComponent):
 
 class FullAdder(ElectricComponent):
 
-    inputs = ('in_a', 'in_b', 'in_carry')
-    outputs = ('out_carry', 'out_sum')
+    inputs = unpack_io('in_a', 'in_b', 'in_carry')
+    outputs = unpack_io('out_carry', 'out_sum')
 
     def __init__(self, in_a: ElectricComponent = LooseWire(), in_b: ElectricComponent = LooseWire(), in_carry: ElectricComponent = LooseWire()):
         self.in_a = in_a
@@ -74,8 +76,8 @@ class FullAdder(ElectricComponent):
 
 class Eight_Bit_Adder(ElectricComponent):
 
-    inputs = ('in_a:8', 'in_b:8', 'in_carry')
-    outputs = ('out_sum:8', 'out_carry')
+    inputs = unpack_io('in_a:8', 'in_b:8', 'in_carry')
+    outputs = unpack_io('out_sum:8', 'out_carry')
 
     def __init__(self, in_a: ElectricComponent = [LooseWire() for x in range(8)],
                  in_b: ElectricComponent = [LooseWire() for x in range(8)],
