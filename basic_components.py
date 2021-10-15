@@ -1,41 +1,20 @@
 from abc import ABC, abstractmethod
 
-from single_state_components import LooseWire
 
-
-# todo:
-# rename forward to downstream
-
-# todo: alle inputs als False initilisieren und circuit direct bauen
-# -> Hilfsklasse DeadEnd die mit get_state/is_property -> False
-#   -> muss forward_connections wieitergeben wenn sei ausgetauscht wird!
-#       -> eigentlich nicht, da connect_input die fc added
-#           -> DeadEnd nach connect input löschen (sollte nicht nötig sein, da nicht mehr referenziert)
-#               -> testen indem in loop immer wieder neues DeadEnd als input connected wird
-# - das initialisieren der Outputs sollte dann nciht mehr nötig sein
-
-# todo?: alle outputs als connectors ausgeben -> compute_state entfällt außer für die
-# grund-bausteine (INV, AND, OR)
-# -> dann geht das hier aber nicht mehr ohne weiteres:
-#     self.INV1 = INV(self.XOR1)
-# -> INV added fc zu XOR1; nicht zu dem connector der aus XOR1 heruas führt
-# stattdessen müsste dann
-#     self.INV1 = INV(self.XOR1.con_out)
-# das erzeugt aber viel getipsel und geht auf Kosten der Lesbarkeit
-# es lässt sich sicher so lösen, aber wie hoch sind die KOsten an die Lesbarkeit und der Wartungsaufwand?
-# Beifang:
-# - jede Menge neue Instanzen
-# - zusammengestzte Elemente haben erstmal keinen eigenen state mehr
-
-# merke:
-# Solange nicht alle inoputs verbunden sind, werden alle outputs auf falsch gestezt!
+# FIXME: Rebuilding the circuit is currently neccesary, because the
+# inner circuit elemts that depend on the LooseWire do not
+# update their inputs automatically
+# Howver, rebuilding the circuit will not release the prvious circuit objects
+# because the dead inputs that were connected maintain a reference in their
+# forward connections
 
 class ElectricComponent(ABC):
     """
     Parent class for all components of the electric circuit
     """
 
-    # Each class should have a tuple specifying expected inputs an available outputs
+    # Each class should have a tuple specifying available inputs and outputs
+    # The output tuple is looped over to check if the output changes
     # inputs = ()
     # outputs = ()
 
@@ -43,33 +22,17 @@ class ElectricComponent(ABC):
     def __init__(self):
         """Attach Inputs"""
 
-    #todo: refcator
-    def setup(self, initial=False):
-        """check_complete -> construct -> compute_state"""
-        if initial:
-            for o in self.outputs:
-                setattr(self, o, False)
-
-        self.check_completion()
-        if self.is_complete:
-            self.build_circuit()
-            self.compute_state()
-
-    def check_completion(self):
-        self.is_complete = False
-        for i in self.inputs:
-            if not isinstance(getattr(self, i), ElectricComponent):
-                return()
-            # try:
-            #     if not getattr(self, i).is_complete:
-            #         return()
-            # except AttributeError:
-            #     return()
-        self.is_complete = True
+    def setup(self):
+        self.build_circuit()
+        self.compute_state()
 
     @abstractmethod
     def build_circuit(self):
-        """Implement the inner logic of the circuit"""
+        """
+        Implement the inner logic of the circuit
+        All Components that are used by get_state need to 
+        have their forward connections added here
+        """
 
     @abstractmethod
     def compute_state(self):
@@ -80,20 +43,17 @@ class ElectricComponent(ABC):
         from recursing all the way down
         """
 
-    @abstractmethod
-    def get_state(self):
+    def get_state(self, port):
         """Returns the current state of the output(s)"""
+        return getattr(self, port)
 
-    def connect_input(self, input_name, input_circuit):
+    def connect_input(self, input_name: str, input_circuit: 'ElectricComponent'):
         """
         Should be used if not all inputs were available at initialization
         """
-        if isinstance(getattr(self, input_name), LooseWire):
-            setattr(self, input_name, input_circuit)
-            input_circuit.add_forward_connection(self)
-            self.setup()
-        else:
-            raise ValueError(input_name + " already connected")
+        # TODO: checken, dass loose-wire bzw. list von looseWire
+        setattr(self, input_name, input_circuit)
+        self.setup()
 
     def add_forward_connection(self, con):
         """Called by downstream elements to add the as a forward connection"""
@@ -121,6 +81,7 @@ class SingleStateComponent(ElectricComponent):
     Parent Class for all components with a singular output
     """
 
+    inputs = ()
     outputs = ('_output', )
 
     def get_state(self):
@@ -134,13 +95,11 @@ class Switch(SingleStateComponent):
     Simple Switch
     This component is special in that is has no inputs
     """
-    # todo: methods for flip, open, close
+    # TODO: methods for flip, open, close
 
-    inputs = ()
-
-    def __init__(self, closed: bool = None):
+    def __init__(self, closed: bool = False):
         self.closed = closed
-        self.setup(initial=True)
+        self.setup()
 
     def build_circuit(self):
         pass
@@ -152,10 +111,10 @@ class Switch(SingleStateComponent):
         self._output = not self._output
         self.forward_pass()
 
-# Alias
+# TODO: Alias
 # This would be deirable but it breaks "isinstance"
 # and inheriting brekas the doc
-#Bit = Switch
+# Bit = Switch
 
 
 class Connector(SingleStateComponent):
@@ -164,12 +123,12 @@ class Connector(SingleStateComponent):
     of components that feauture multiple outputs.
     """
 
-    inputs = ('component', )
+    inputs = ('component_')
 
-    def __init__(self, component:ElectricComponent, port):
+    def __init__(self, component: ElectricComponent, port: str):
         self.component = component
         self.port = port
-        self.setup(initial=True)
+        self.setup()
 
     def build_circuit(self):
         self.component.add_forward_connection(self)
@@ -181,19 +140,22 @@ class Connector(SingleStateComponent):
 class LooseWire(SingleStateComponent):
     """
     This component is used solely for initializing unconnected inputs
-    It never carries ac current
+    It never carries a current
     """
 
-    inputs = ()
+    # HACK: This makes LooseWire() cretae new instances
+    # when used as default function paramter. Might not be needed
+    # when/if all arguments are parsed
+    __slots__ = ['_output']
 
     def __init__(self):
-        self.setup(initial=True)
+        self.setup()
 
     def build_circuit(self):
         pass
 
     def compute_state(self):
-        pass
+        self._output = False
 
 
 # Tests:
