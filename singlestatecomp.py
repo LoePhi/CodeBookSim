@@ -1,5 +1,4 @@
 from component import ElectricComponent
-from basemethods import unpack_io
 
 
 class SingleStateComponent(ElectricComponent):
@@ -7,7 +6,7 @@ class SingleStateComponent(ElectricComponent):
     Parent Class for all components with a singular output
     """
 
-    outputs = unpack_io('_output', )
+    outputs = ElectricComponent.unpack_io('_output', )
 
     def get_state(self):
         return(self._output)
@@ -18,7 +17,7 @@ class SingleStateComponent(ElectricComponent):
 class Switch(SingleStateComponent):
     """
     Simple Switch
-    This component is special in that is has no inputs
+    It carries a current when it is closed
     """
     # TODO: methods for flip, open, close
 
@@ -36,6 +35,14 @@ class Switch(SingleStateComponent):
         self._output = not self._output
         self.forward_pass()
 
+    def open(self):
+        self._output = False
+        self.forward_pass()
+
+    def close(self):
+        self._output = True
+        self.forward_pass()
+
 # TODO: Alias
 # This would be deirable but it breaks "isinstance"
 # and inheriting brekas the doc
@@ -48,7 +55,7 @@ class Connector(SingleStateComponent):
     of components that feauture multiple outputs.
     """
 
-    inputs = unpack_io('component_')
+    inputs = ElectricComponent.unpack_io('component_')
 
     def __init__(self, component: ElectricComponent, port: str):
         self.component = component

@@ -1,7 +1,4 @@
 from abc import ABC, abstractmethod
-from basemethods import unpack_io
-
-#import utility_functions as uf
 
 # FIXME: Rebuilding the circuit is currently neccesary, because the
 # inner circuit elemts that depend on the LooseWire do not
@@ -18,8 +15,15 @@ class ElectricComponent(ABC):
 
     # Each class should have a tuple specifying available inputs and outputs
     # The output tuple is looped over to check if the output changes
-    inputs = unpack_io()
-    outputs = unpack_io()
+    @staticmethod
+    def unpack_io(*io_str):
+        io_dict = {}
+        for i in range(len(io_str)):
+            x = io_str[i].split(":")
+            io_dict[x[0]] = {'N': x[1] if len(x) > 1 else 1}
+        return io_dict
+    # inputs = unpack_io()
+    # outputs = unpack_io()
 
     @abstractmethod
     def __init__(self):
