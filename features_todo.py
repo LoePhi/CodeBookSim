@@ -26,24 +26,28 @@ def hihi(a=None, b=None):
 
 hihi(2, b=3)
 
+# Alternative1?: funktion in defaults nutzne -> geht nicht
 
-# TODO?: alle outputs als connectors ausgeben 
-# -> compute_state entfällt außer für die grund-bausteine (INV, AND, OR)
-# -> dann geht das hier aber nicht mehr ohne weiteres:
-#     self.INV1 = INV(self.XOR1)
-# -> INV added fc zu XOR1; nicht zu dem connector der aus XOR1 heruas führt
-# stattdessen müsste dann
-#     self.INV1 = INV(self.XOR1.con_out)
-# das erzeugt aber viel getipsel und geht auf Kosten der Lesbarkeit
-# es lässt sich sicher so lösen, aber wie hoch sind die KOsten an die Lesbarkeit und der Wartungsaufwand?
-# Beifang:
-# - jede Menge neue Instanzen
-# - zusammengestzte Elemente haben erstmal keinen eigenen state mehr
-# !ACHTUNG: so lange der circuit neu gebaut wird, wenn ein innput hinzu kommt dann
-#   führt diese Vorgehensweise dazu, dass die forward connections verloren gehen
+# Alternative2: setup benutzen -> allerdings müsste ElectricComponent dafür LooseWire kennen
 
+
+# TODO?: by default für alle outputs connectors erzeugen?
+# + weniger getipsel
+# - unnötige connectoren für singlestatecomponents
+# - schlechter ersichtlich was genau beim bau des circuits passiert,
+#       auch weil die ssc-connectoren erstmal nicht benutzt werden
+# + einheitliches interface für 
+
+# TODO: __repr__ mit pretty printing
 
 # TODO: Implement __str__ für alle Komponenten
 
 # TODO: ?Macht es Sinn __eq__ basierend auf __str__ zu bauen?
 # -> Nachlesen was für __eq__ erwartet wird
+
+# TODO: Use queue for updates
+# -> bsp. 8bitadder: bisher löst jede änderung eines bits eine Kaskade für sich aus
+# durch queue könnten alle gemeinsam erfolgen
+# !Auf Reihenfolge der bits achten! lsb zuerst
+
+# TODO: out-connectors können aus der output-liste erzeugt werden, egal ob benutzt oder nicht

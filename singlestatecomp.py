@@ -19,8 +19,7 @@ class Switch(SingleStateComponent):
     Simple Switch
     It carries a current when it is closed
     """
-    # TODO: methods for flip, open, close
-
+ 
     def __init__(self, closed: bool = False):
         self.closed = closed
         self.setup()
@@ -43,30 +42,24 @@ class Switch(SingleStateComponent):
         self._output = True
         self.forward_pass()
 
-# TODO: Alias
-# This would be deirable but it breaks "isinstance"
-# and inheriting brekas the doc
-# Bit = Switch
-
-
 class Connector(SingleStateComponent):
     """
     The connector is used for addressing indiviudal output lines
     of components that feauture multiple outputs.
     """
 
-    inputs = ElectricComponent.unpack_io('component_')
+    inputs = ElectricComponent.unpack_io('in_a')
 
-    def __init__(self, component: ElectricComponent, port: str):
-        self.component = component
+    def __init__(self, in_a: ElectricComponent, port: str):
+        self.in_a = in_a
         self.port = port
         self.setup()
 
     def build_circuit(self):
-        self.component.add_forward_connection(self)
+        self.in_a.add_connection(self, '_in_a')
 
     def compute_state(self):
-        self._output = self.component.get_state(self.port)
+        self._output = self.in_a.get_state(self.port)
 
 
 class LooseWire(SingleStateComponent):
@@ -78,7 +71,7 @@ class LooseWire(SingleStateComponent):
     # HACK: This makes LooseWire() cretae new instances
     # when used as default function paramter. Might not be needed
     # when/if all arguments are parsed
-    __slots__ = ['_output']
+    #__slots__ = ['_output']
 
     def __init__(self):
         self.setup()
@@ -95,4 +88,8 @@ assert(Switch(True).is_on is True)
 assert(Switch(False).is_on is False)
 tmp = Switch(False)
 tmp.flip()
+assert(tmp.is_on is True)
+tmp.open()
+assert(tmp.is_on is False)
+tmp.close()
 assert(tmp.is_on is True)

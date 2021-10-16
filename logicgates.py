@@ -12,7 +12,7 @@ class INV(SingleStateComponent):
         self.setup()
 
     def build_circuit(self):
-        self.in_a.add_forward_connection(self)
+        self.in_a.add_connection(self, 'in_a')
 
     def compute_state(self):
         self._output = not self.in_a.is_on
@@ -35,8 +35,8 @@ class AND(LogicGate):
     """AND-Gate"""
 
     def build_circuit(self):
-        self.in_a.add_forward_connection(self)
-        self.in_b.add_forward_connection(self)
+        self.in_a.add_connection(self, 'in_a')
+        self.in_b.add_connection(self, 'in_b')
 
     def compute_state(self):
         self._output = self.in_a.is_on and self.in_b.is_on
@@ -46,8 +46,8 @@ class OR(LogicGate):
     """OR-Gate"""
 
     def build_circuit(self):
-        self.in_a.add_forward_connection(self)
-        self.in_b.add_forward_connection(self)
+        self.in_a.add_connection(self, 'in_a')
+        self.in_b.add_connection(self, 'in_b')
 
     def compute_state(self):
         self._output = self.in_a.is_on or self.in_b.is_on
@@ -59,7 +59,7 @@ class NAND(LogicGate):
     def build_circuit(self):
         self.AND1 = AND(self.in_a, self.in_b)
         self.INV1 = INV(self.AND1)
-        self.INV1.add_forward_connection(self)
+        self.INV1.add_connection(self, '_output')
 
     def compute_state(self):
         self._output = self.INV1.is_on
@@ -71,7 +71,7 @@ class NOR(LogicGate):
     def build_circuit(self):
         self.OR1 = OR(self.in_a, self.in_b)
         self.INV1 = INV(self.OR1)
-        self.INV1.add_forward_connection(self)
+        self.INV1.add_connection(self, '_output')
 
     def compute_state(self):
         self._output = self.INV1.is_on
@@ -84,7 +84,7 @@ class XOR(LogicGate):
         self.OR1 = OR(self.in_a, self.in_b)
         self.NAND1 = NAND(self.in_a, self.in_b)
         self.AND1 = AND(self.OR1, self.NAND1)
-        self.AND1.add_forward_connection(self)
+        self.AND1.add_connection(self, '_output')
 
     def compute_state(self):
         self._output = self.AND1.is_on
@@ -167,16 +167,9 @@ assert(nor1.is_on is True)
 
 or1.connect_input("in_b", b2)
 nor1.connect_input("in_a", b2)
+
 assert(or1.is_on is True)
 assert(nor1.is_on is False)
-
-# connect to already connected input
-# Wieder einführen wenn wieder auf bereits connected geprüft wird
-# try:
-#     nor1.connect_input("in_a", b2)
-#     assert(True is False)
-# except ValueError:
-#     assert(True is True)
 
 # unstable circuit (feeds upon itself and keeps changing states)
 # todo: nice
@@ -192,3 +185,15 @@ try:
     assert(True is False)
 except RecursionError:
     assert(True is True)
+
+# propagation trough multiple units
+s1 = Switch(True)
+s2 = Switch(True)
+s3 = Switch(True)
+and1 = AND(in_b=s1)
+and2 = AND(and1, s2)
+and3 = AND(and2, s3)
+and1.connect_input('in_a', Switch(True))
+assert(and3.is_on is True)
+s1.flip()
+assert(and3.is_on is False)

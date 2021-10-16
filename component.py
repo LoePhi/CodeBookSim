@@ -1,12 +1,5 @@
 from abc import ABC, abstractmethod
 
-# FIXME: Rebuilding the circuit is currently neccesary, because the
-# inner circuit elemts that depend on the LooseWire do not
-# update their inputs automatically
-# Howver, rebuilding the circuit will not release the prvious circuit objects
-# because the dead inputs that were connected maintain a reference in their
-# forward connections
-
 
 class ElectricComponent(ABC):
     """
@@ -20,7 +13,7 @@ class ElectricComponent(ABC):
         io_dict = {}
         for i in range(len(io_str)):
             x = io_str[i].split(":")
-            io_dict[x[0]] = {'N': x[1] if len(x) > 1 else 1}
+            io_dict[x[0]] = {'N': int(x[1]) if len(x) > 1 else 1}
         return io_dict
     # inputs = unpack_io()
     # outputs = unpack_io()
@@ -30,6 +23,8 @@ class ElectricComponent(ABC):
         """Attach Inputs"""
 
     def setup(self):
+        self.forward_connections = []
+        self.backward_connections = [] # not used
         self.build_circuit()
         self.compute_state()
 
@@ -58,21 +53,38 @@ class ElectricComponent(ABC):
         """
         Should be used if not all inputs were available at initialization
         """
-        # TODO: checken, dass loose-wire bzw. list von looseWire
+
+        old_input = getattr(self, input_name)
+        islist = isinstance(old_input, list)
+        
+        if not islist:
+            old_input = [old_input]
+            input_circuit = [input_circuit]
+ 
+        for i in range(len(input_circuit)):
+            for fc in old_input[i].forward_connections:
+                setattr(fc[0], fc[1], input_circuit[i])
+                input_circuit[i].add_connection(fc[0], fc[1])
+                fc[0].update()
+            
+        if not islist:
+            input_circuit = input_circuit[0]
+
+        # Not functional, just for tracking
         setattr(self, input_name, input_circuit)
-        self.setup()
 
-    def add_forward_connection(self, con):
+
+    def add_connection(self, con, port):
         """Called by downstream elements to add the as a forward connection"""
-        if not hasattr(self, 'forward_connections'):
-            self.forward_connections = []
         if con not in self.forward_connections:
-            self.forward_connections.append(con)
-
+            self.forward_connections.append((con, port))
+        # backward connections can be used for debugging the circuit
+        if self not in con.backward_connections:
+            con.backward_connections.append(self)
+        
     def forward_pass(self):
-        if hasattr(self, 'forward_connections'):
-            for fc in self.forward_connections:
-                fc.update()
+        for fc in self.forward_connections:
+            fc[0].update()
 
     # TODO: ?keep state
     def update(self):
