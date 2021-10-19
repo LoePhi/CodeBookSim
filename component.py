@@ -24,7 +24,7 @@ class ElectricComponent(ABC):
 
     def setup(self):
         self.forward_connections = []
-        self.backward_connections = [] # not used
+        self.backward_connections = []  # not used
         self.build_circuit()
         self.compute_state()
 
@@ -32,7 +32,7 @@ class ElectricComponent(ABC):
     def build_circuit(self):
         """
         Implement the inner logic of the circuit
-        All Components that are used by get_state need to 
+        All Components that are used by get_state need to
         have their forward connections added here
         """
 
@@ -49,30 +49,30 @@ class ElectricComponent(ABC):
         """Returns the current state of the output(s)"""
         return getattr(self, port)
 
-    def connect_input(self, input_name: str, input_circuit: 'ElectricComponent'):
+    def connect_input(self, input_name: str,
+                      input_circuit: 'ElectricComponent'):
         """
         Should be used if not all inputs were available at initialization
         """
 
         old_input = getattr(self, input_name)
         islist = isinstance(old_input, list)
-        
+
         if not islist:
             old_input = [old_input]
             input_circuit = [input_circuit]
- 
+
         for i in range(len(input_circuit)):
             for fc in old_input[i].forward_connections:
                 setattr(fc[0], fc[1], input_circuit[i])
                 input_circuit[i].add_connection(fc[0], fc[1])
                 fc[0].update()
-            
+
         if not islist:
             input_circuit = input_circuit[0]
 
         # Not functional, just for tracking
         setattr(self, input_name, input_circuit)
-
 
     def add_connection(self, con, port):
         """Called by downstream elements to add the as a forward connection"""
@@ -81,7 +81,7 @@ class ElectricComponent(ABC):
         # backward connections can be used for debugging the circuit
         if self not in con.backward_connections:
             con.backward_connections.append(self)
-        
+
     def forward_pass(self):
         for fc in self.forward_connections:
             fc[0].update()

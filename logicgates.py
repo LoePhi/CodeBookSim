@@ -25,7 +25,8 @@ class LogicGate(SingleStateComponent):
 
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(), in_b: ElectricComponent = LooseWire()):
+    def __init__(self, in_a: ElectricComponent = LooseWire(),
+                 in_b: ElectricComponent = LooseWire()):
         self.in_a = in_a
         self.in_b = in_b
         self.setup()

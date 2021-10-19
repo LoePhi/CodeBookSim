@@ -1,3 +1,4 @@
+import cProfile
 from component import ElectricComponent
 from singlestatecomp import Switch, Connector, LooseWire
 from logicgates import AND, OR, XOR
@@ -9,7 +10,8 @@ class HalfAdder(ElectricComponent):
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
     outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(), in_b: ElectricComponent = LooseWire()):
+    def __init__(self, in_a: ElectricComponent = LooseWire(),
+                 in_b: ElectricComponent = LooseWire()):
         self.in_a = in_a
         self.in_b = in_b
         self.setup()
@@ -26,16 +28,6 @@ class HalfAdder(ElectricComponent):
         self.out_sum = self.XOR1.is_on
         self.out_carry = self.AND1.is_on
 
-    # TODO: replace with getattr? -> nur carry/sum statt out_carry/out_sum
-    # -> in Zus. mit alles outputs sind connectors betrachten
-    # def get_state(self, port):
-    #     if port == "carry":
-    #         return self.out_carry
-    #     elif port == "sum":
-    #         return self.out_sum
-    #     else:
-    #         raise ValueError("Invalid Port '" + port + "'")
-
     def __str__(self):
         return str(int(self.out_carry)) + str(int(self.out_sum))
 
@@ -45,7 +37,9 @@ class FullAdder(ElectricComponent):
     inputs = ElectricComponent.unpack_io('in_a', 'in_b', 'in_carry')
     outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(), in_b: ElectricComponent = LooseWire(), in_carry: ElectricComponent = LooseWire()):
+    def __init__(self, in_a: ElectricComponent = LooseWire(),
+                 in_b: ElectricComponent = LooseWire(),
+                 in_carry: ElectricComponent = LooseWire()):
         self.in_a = in_a
         self.in_b = in_b
         self.in_carry = in_carry
@@ -73,7 +67,8 @@ class Eight_Bit_Adder(ElectricComponent):
     inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_carry')
     outputs = ElectricComponent.unpack_io('out_sum:8', 'out_carry')
 
-    def __init__(self, in_a: ElectricComponent = [LooseWire() for x in range(8)],
+    def __init__(self,
+                 in_a: ElectricComponent = [LooseWire() for x in range(8)],
                  in_b: ElectricComponent = [LooseWire() for x in range(8)],
                  in_carry: ElectricComponent = LooseWire()):
         self.in_a = in_a
@@ -110,7 +105,8 @@ class Sixteen_Bit_Adder(ElectricComponent):
     inputs = ElectricComponent.unpack_io('in_a:16', 'in_b:16', 'in_carry')
     outputs = ElectricComponent.unpack_io('out_sum:16', 'out_carry')
 
-    def __init__(self, in_a: ElectricComponent = [LooseWire() for x in range(16)],
+    def __init__(self,
+                 in_a: ElectricComponent = [LooseWire() for x in range(16)],
                  in_b: ElectricComponent = [LooseWire() for x in range(16)],
                  in_carry: ElectricComponent = LooseWire()):
         self.in_a = in_a
@@ -121,8 +117,10 @@ class Sixteen_Bit_Adder(ElectricComponent):
         self.con_carry = Connector(self, "out_carry")
 
     def build_circuit(self):
-        self.eba_low = Eight_Bit_Adder(self.in_a[:8], self.in_b[:8], self.in_carry)
-        self.eba_high = Eight_Bit_Adder(self.in_a[8:], self.in_b[8:], self.eba_low.con_carry)
+        self.eba_low = Eight_Bit_Adder(
+            self.in_a[:8], self.in_b[:8], self.in_carry)
+        self.eba_high = Eight_Bit_Adder(
+            self.in_a[8:], self.in_b[8:], self.eba_low.con_carry)
         self.eba_low.con_sum.add_connection(self, "out_sum")
         self.eba_high.con_sum.add_connection(self, "out_carry")
 
@@ -194,10 +192,12 @@ assert(eba4.__str__() == '0_10000010')
 eba4.connect_input("in_b", bts('10001100'))
 assert(eba4.__str__() == '1_00001110')
 
-import cProfile
-cProfile.run("Sixteen_Bit_Adder(bts('1000000000000001'), bts('1000000000000001'), Switch(True))")
+cProfile.run(
+    "Sixteen_Bit_Adder(bts('1000000000000001'),"
+    "bts('1000000000000001'), Switch(True))")
 
 
 # todo 16Bitadder
-sba1 = Sixteen_Bit_Adder(bts('1000000000000001'), bts('1000000000000001'), Switch(True))
+sba1 = Sixteen_Bit_Adder(bts('1000000000000001'),
+                         bts('1000000000000001'), Switch(True))
 assert(sba1.__str__() == '0_0000000100000011')

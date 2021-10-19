@@ -26,9 +26,7 @@ def hihi(a=None, b=None):
 
 hihi(2, b=3)
 
-# Alternative1?: funktion in defaults nutzne -> geht nicht
-
-# Alternative2: setup benutzen -> allerdings müsste ElectricComponent dafür LooseWire kennen
+# Alternative: setup benutzen -> allerdings müsste ElectricComponent dafür LooseWire kennen
 
 
 # TODO?: by default für alle outputs connectors erzeugen?
@@ -51,3 +49,8 @@ hihi(2, b=3)
 # !Auf Reihenfolge der bits achten! lsb zuerst
 
 # TODO: out-connectors können aus der output-liste erzeugt werden, egal ob benutzt oder nicht
+
+# TODO: forward_connections zu _output, out_carry, etc. mit anderem Namen kennzeichnen (z.B. <class>_carry)
+# -> auch damit es einen Fhler gibt wenn versucht wird dem einen neuen Input zuzuweisen
+
+# TODO: bessere namen für in-, outputs; v.a. _output ersetzen

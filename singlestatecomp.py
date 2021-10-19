@@ -19,7 +19,7 @@ class Switch(SingleStateComponent):
     Simple Switch
     It carries a current when it is closed
     """
- 
+
     def __init__(self, closed: bool = False):
         self.closed = closed
         self.setup()
@@ -41,6 +41,7 @@ class Switch(SingleStateComponent):
     def close(self):
         self._output = True
         self.forward_pass()
+
 
 class Connector(SingleStateComponent):
     """
@@ -71,7 +72,7 @@ class LooseWire(SingleStateComponent):
     # HACK: This makes LooseWire() cretae new instances
     # when used as default function paramter. Might not be needed
     # when/if all arguments are parsed
-    #__slots__ = ['_output']
+    __slots__ = ['_output']
 
     def __init__(self):
         self.setup()
