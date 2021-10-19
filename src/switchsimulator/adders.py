@@ -1,8 +1,8 @@
 import cProfile
-from component import ElectricComponent
-from singlestatecomp import Switch, Connector, LooseWire
-from logicgates import AND, OR, XOR
-from helpers import bts
+from .component import ElectricComponent
+from .singlestatecomp import Switch, Connector, LooseWire
+from .logicgates import AND, OR, XOR
+from .helpers import bts
 
 
 class HalfAdder(ElectricComponent):

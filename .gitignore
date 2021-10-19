@@ -1,4 +1,5 @@
 __pychache__/
 .vscode/
 *.pyc
-tmp.py
+*.egg-info/
+switchsimulator/tmp.py

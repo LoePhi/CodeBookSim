@@ -1,4 +1,4 @@
-from component import ElectricComponent
+from .component import ElectricComponent
 
 
 class SingleStateComponent(ElectricComponent):
@@ -82,15 +82,3 @@ class LooseWire(SingleStateComponent):
 
     def compute_state(self):
         self._output = False
-
-
-# Tests:
-assert(Switch(True).is_on is True)
-assert(Switch(False).is_on is False)
-tmp = Switch(False)
-tmp.flip()
-assert(tmp.is_on is True)
-tmp.open()
-assert(tmp.is_on is False)
-tmp.close()
-assert(tmp.is_on is True)

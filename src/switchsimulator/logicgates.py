@@ -1,5 +1,5 @@
-from component import ElectricComponent
-from singlestatecomp import SingleStateComponent, Switch, LooseWire
+from .component import ElectricComponent
+from .singlestatecomp import SingleStateComponent, Switch, LooseWire
 
 
 class INV(SingleStateComponent):
