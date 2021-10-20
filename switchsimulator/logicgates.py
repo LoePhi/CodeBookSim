@@ -7,14 +7,23 @@ class IntegratedComponent(ElectricComponent):
     def compute_state(self):
         raise NotImplementedError("nocomp")
 
-    def get_state(self, port):
-        return getattr(self, port).get_state()
-
     def build_circuit(self):
         pass
 
 
-class NAND(IntegratedComponent):
+class ICSingleLine(IntegratedComponent):
+    def get_state(self, port="out_a"):
+        return getattr(self, port).get_state(port)
+
+    is_on = property(get_state)
+
+    # TODOTHIS
+    def add_connection(self, con, port):
+        """Called by downstream elements to add the as a forward connection"""
+        self.out_a.add_connection((con, port))
+
+
+class NAND(ICSingleLine):
     """NAND-Gate"""
 
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
@@ -28,15 +37,25 @@ class NAND(IntegratedComponent):
         self.out_a = INV(self.AND1)
 
 
-
 a = Switch(True)
 b = Switch(False)
 nand1 = NAND(a, b)
-nand2 = NAND(nand1, b)
-nand3 = NAND(nand1, nand2)
-nand2.get_state()
-nand3.get_state()
+nand2 = NAND(nand1, a)
+nand1.is_on  # T
+nand2.is_on  # F
+
+or1 = OR(a, b)  # T
+nand3 = NAND(nand1, or1)
+nand3.is_on  # F
 b.flip()
+nand3.is_on  # T
+
+# waruzm hat 
+nand1.out_a.forward_connections[0][0].__dict__
+# keine backward connection zu 
+nand1.out_a.__dict__
+
+# 
 
 class NOR(LogicGate):
     """NOR-Gate"""

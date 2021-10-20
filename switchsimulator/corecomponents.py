@@ -13,11 +13,17 @@ class CoreComponent(ElectricComponent):
 
     outputs = ElectricComponent.unpack_io('out_a', )
 
-    def get_state(self):
-        return(self.out_a)
+    def setup(self):
+        self.forward_connections = []
+        self.backward_connections = []  # not used
+        self.build_circuit()
+        self.compute_state()
 
+    def get_state(self, port="out_a"):
+        """Returns the current state of the output(s)"""
+        return getattr(self, port)
+        
     is_on = property(get_state)
-
 
 class Switch(CoreComponent):
     """
@@ -47,12 +53,14 @@ class Switch(CoreComponent):
         self.out_a = True
         self.forward_pass()
 
-# TODO: hier comupte und so überarbeiten
+
 class Connector(CoreComponent):
     """
     The connector is used for addressing indiviudal output lines
     of components that feauture multiple outputs.
     """
+    # TODO: hier comupte und so überarbeiten
+    # alle anderen core-elemnte haben nur bool out
 
     inputs = ElectricComponent.unpack_io('in_a')
 

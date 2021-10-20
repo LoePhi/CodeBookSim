@@ -22,29 +22,6 @@ class ElectricComponent(ABC):
     def __init__(self):
         """Attach Inputs"""
 
-    def setup(self):
-        self.forward_connections = []
-        self.backward_connections = []  # not used
-        self.build_circuit()
-        self.compute_state()
-
-    @abstractmethod
-    def build_circuit(self):
-        """
-        Implement the inner logic of the circuit
-        All Components that are used by get_state need to
-        have their forward connections added here
-        """
-
-    @abstractmethod
-    def compute_state(self):
-        """
-        Computes the current state of the output(s)
-
-        This is seperated from get_state to prevent the circuit
-        from recursing all the way down
-        """
-
     def get_state(self, port):
         """Returns the current state of the output(s)"""
         return getattr(self, port)
