@@ -1,6 +1,7 @@
 from component import ElectricComponent
-from singlestatecomp import Connector, LooseWire
+from singlestatecomp import Connector, LooseWire, Switch
 from logicgates import AND, OR, XOR
+from misccomp import OnesComplement
 
 
 class HalfAdder(ElectricComponent):
@@ -130,3 +131,48 @@ class Sixteen_Bit_Adder(ElectricComponent):
         bitlist = [str(int(self.out_carry))] + ['_'] + \
             [str(int(b)) for b in self.out_sum]
         return ''.join(bitlist)
+
+
+class AddMin(ElectricComponent):
+
+    inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_sub')
+    outputs = ElectricComponent.unpack_io('out_sum:8', 'out_flow')
+
+    def __init__(self,
+                 in_a: ElectricComponent = [LooseWire() for x in range(8)],
+                 in_b: ElectricComponent = [LooseWire() for x in range(8)],
+                 in_sub: ElectricComponent = LooseWire()):
+        self.in_a = in_a
+        self.in_b = in_b
+        self.in_sub = in_sub
+        self.setup()
+        self.con_sum = Connector(self, "out_sum")
+        self.con_flow = Connector(self, "out_flow")
+
+    def build_circuit(self):
+        self.oc1 = OnesComplement(self.in_b, self.in_sub)
+        self.eba1 = Eight_Bit_Adder(self.in_a, self.oc1, self.in_sub)
+        self.xor1 = XOR(self.eba1.con_carry, self.in_sub)
+        self.eba1.con_sum.add_connection(self, "out_sum")
+        self.xor1.add_connection(self, "out_flow")
+
+    def compute_state(self):
+        self.out_sum = self.eba1.con_sum.is_on
+        self.out_flow = self.xor1.is_on
+
+    def __str__(self):
+        if not self.out_flow:
+            control = ""
+        elif self.in_sub.is_on:
+            control = "UnDeRfLoW"
+        else:
+            control = "OvErFlOw"
+        bitlist = [control] + [str(int(b)) for b in self.out_sum]
+        return ''.join(bitlist)
+
+from helpers import bts
+
+AddMin(bts('00000001'), bts('00000001'), Switch(False))
+
+oc1 = OnesComplement(bts('00000001'),Switch(True))
+oc1.__dict__

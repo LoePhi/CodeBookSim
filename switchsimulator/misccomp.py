@@ -6,7 +6,7 @@ from logicgates import XOR
 class OnesComplement(ElectricComponent):
 
     inputs = ElectricComponent.unpack_io('in_in:8', 'in_invert')
-    outputs = ElectricComponent.unpack_io('_outline')
+    outputs = ElectricComponent.unpack_io('_outline:8')
 
     def __init__(self,
                  in_in: ElectricComponent = [LooseWire() for x in range(8)],
@@ -18,7 +18,7 @@ class OnesComplement(ElectricComponent):
     def build_circuit(self):
         self.xors = [XOR(inp, self.in_invert) for inp in self.in_in]
         for xor in self.xors:
-            xor.add_connection(self, 'outline')
+            xor.add_connection(self, '_outline')
 
     def compute_state(self):
         self._outline = [xor.is_on for xor in self.xors]
