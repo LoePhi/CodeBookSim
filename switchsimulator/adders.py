@@ -1,8 +1,6 @@
-import cProfile
-from .component import ElectricComponent
-from .singlestatecomp import Switch, Connector, LooseWire
-from .logicgates import AND, OR, XOR
-from .helpers import bts
+from component import ElectricComponent
+from singlestatecomp import Connector, LooseWire
+from logicgates import AND, OR, XOR
 
 
 class HalfAdder(ElectricComponent):
@@ -132,72 +130,3 @@ class Sixteen_Bit_Adder(ElectricComponent):
         bitlist = [str(int(self.out_carry))] + ['_'] + \
             [str(int(b)) for b in self.out_sum]
         return ''.join(bitlist)
-
-# Tests
-
-
-b1 = Switch(True)
-b2 = Switch(True)
-b3 = Switch(False)
-b4 = Switch(False)
-
-ha1 = HalfAdder(b1, b2)
-assert(ha1.__str__() == '10')
-ha2 = HalfAdder(b3, b4)
-assert(ha2.__str__() == '00')
-ha3 = HalfAdder(b1, b3)
-assert(ha3.__str__() == '01')
-ha4 = HalfAdder(b3, b1)
-assert(ha4.__str__() == '01')
-
-b5 = Switch(True)
-b6 = Switch(False)
-
-fa1 = FullAdder(b1, b2, b5)
-assert(fa1.__str__() == '11')
-fa2 = FullAdder(b3, b4, b6)
-assert(fa2.__str__() == '00')
-fa3 = FullAdder(b1, b2, b6)
-assert(fa3.__str__() == '10')
-fa4 = FullAdder(b1, b3, b6)
-assert(fa4.__str__() == '01')
-
-b1.flip()
-assert(ha1.__str__() == '01')
-assert(ha4.__str__() == '00')
-assert(fa1.__str__() == '10')
-assert(fa3.__str__() == '01')
-assert(fa4.__str__() == '00')
-b1.flip()
-assert(ha1.__str__() == '10')
-b3.flip()
-assert(ha3.__str__() == '10')
-assert(fa2.__str__() == '01')
-assert(fa4.__str__() == '10')
-
-
-eba1 = Eight_Bit_Adder(bts('00000001'), bts('00000001'), Switch(False))
-assert(eba1.__str__() == '0_00000010')
-eba2 = Eight_Bit_Adder(bts('00000001'), bts('00000001'), Switch(True))
-assert(eba2.__str__() == '0_00000011')
-eba3 = Eight_Bit_Adder(bts('10000001'), bts('10000001'), Switch(True))
-assert(eba3.__str__() == '1_00000011')
-
-
-eba4 = Eight_Bit_Adder(bts('10000001'))
-assert(eba4.__str__() == '0_10000001')
-b0 = Switch(True)
-eba4.connect_input("in_carry", b0)
-assert(eba4.__str__() == '0_10000010')
-eba4.connect_input("in_b", bts('10001100'))
-assert(eba4.__str__() == '1_00001110')
-
-cProfile.run(
-    "Sixteen_Bit_Adder(bts('1000000000000001'),"
-    "bts('1000000000000001'), Switch(True))")
-
-
-# todo 16Bitadder
-sba1 = Sixteen_Bit_Adder(bts('1000000000000001'),
-                         bts('1000000000000001'), Switch(True))
-assert(sba1.__str__() == '0_0000000100000011')

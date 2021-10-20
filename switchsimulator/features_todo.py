@@ -1,8 +1,10 @@
+# flake8: noqa
+
 # TODO: Input-Handling
 # Inputs automatisch umwandeln (eg '1',1,'1010' -> Switch(T), S(T), [S(T), S(F), ..])
-# Dabei evtl. auch den default-Input verändern. Im Moment erzeugen die 
+# Dabei evtl. auch den default-Input verändern. Im Moment erzeugen die
 # LooseWire()-Defaults nur deshalb eigene Instanzen weil __slots__ in
-# LooseWire gesetzt ist. Das ist von außen aber nicht ersichtlich 
+# LooseWire gesetzt ist. Das ist von außen aber nicht ersichtlich
 
 # Ich denke die Inits könnten in dieser Weise decoriert werden
 # um die Inputs automatisch umzuwandeln
@@ -19,10 +21,12 @@ def my_dec(func):
         return func(*rea, **kwargs)
     return inner
 
+
 @my_dec
 def hihi(a=None, b=None):
     print(a)
     print(b)
+
 
 hihi(2, b=3)
 
@@ -34,7 +38,7 @@ hihi(2, b=3)
 # - unnötige connectoren für singlestatecomponents
 # - schlechter ersichtlich was genau beim bau des circuits passiert,
 #       auch weil die ssc-connectoren erstmal nicht benutzt werden
-# + einheitliches interface für 
+# + einheitliches interface für automatisierungen
 
 # TODO: __repr__ mit pretty printing
 
@@ -54,3 +58,6 @@ hihi(2, b=3)
 # -> auch damit es einen Fhler gibt wenn versucht wird dem einen neuen Input zuzuweisen
 
 # TODO: bessere namen für in-, outputs; v.a. _output ersetzen
+
+# TODO: helpers -> überlegen wie weit ich hier abstrahieren möchte (zb selebr zwischen systemen kovertieren)
+# -> dann gute namen finden, richtig funktionen auswählen und tests schreiben

@@ -1,4 +1,4 @@
-from .component import ElectricComponent
+from component import ElectricComponent
 
 
 class SingleStateComponent(ElectricComponent):

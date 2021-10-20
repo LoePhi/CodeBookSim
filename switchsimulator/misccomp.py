@@ -1,7 +1,6 @@
 from component import ElectricComponent
-from singlestatecomp import LooseWire, Switch
+from singlestatecomp import LooseWire
 from logicgates import XOR
-from helpers import bts
 
 
 class OnesComplement(ElectricComponent):
@@ -27,11 +26,3 @@ class OnesComplement(ElectricComponent):
     def __str__(self):
         bitlist = [str(int(b)) for b in self._outline]
         return ''.join(bitlist)
-
-
-i1 = Switch(True)
-myinp = bts('01010101')
-asd = OnesComplement(myinp, i1)
-print(asd)
-i1.flip()
-print(asd)

@@ -1,4 +1,4 @@
-from . import singlestatecomp as ssc
+import singlestatecomp as ssc
 
 
 def bin_to_switch(bin_str):
