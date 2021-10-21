@@ -1,8 +1,8 @@
-import singlestatecomp as ssc
+import corecomponents as cc
 
 
 def bin_to_switch(bin_str):
-    return [ssc.Switch(bool(int(b))) for b in bin_str]
+    return [cc.Switch(bool(int(b))) for b in bin_str]
 
 
 def int_to_switch(dec_int):
@@ -38,4 +38,4 @@ def bit_to_switch_tmp(bit8):
     this is description
     """
 
-    return [ssc.Switch(bool(int(b))) for b in bit8]
+    return [cc.Switch(bool(int(b))) for b in bit8]

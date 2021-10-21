@@ -1,4 +1,4 @@
-from switchsimulator.singlestatecomp import Switch
+from switchsimulator.corecomponents import Switch
 from switchsimulator.adders import HalfAdder, FullAdder
 from switchsimulator.adders import Eight_Bit_Adder, Sixteen_Bit_Adder, AddMin
 from switchsimulator.helpers import bts
