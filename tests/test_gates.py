@@ -111,9 +111,24 @@ def test_connect_multiprop():
     and2 = AND(and1, s2)
     and3 = AND(and2, s3)
     and1.connect_input('in_a', Switch(True))
-    assert(and3.is_on is True)
+    assert(and3.is_on)
     s1.flip()
-    assert(and3.is_on is False)
+    assert(not and3.is_on)
+
+
+def test_connect_multiprop_noncore():
+    """Test forward prob trough multiple layers after new connect"""
+    s1 = Switch(True)
+    s2 = Switch(True)
+    s3 = Switch(True)
+    nand1 = NAND(in_b=s1)  # T
+    xor1 = XOR(in_a=s2)  # T
+    nor1 = NOR(nand1, xor1)  # F
+    nand1.connect_input('in_a', s3)
+    xor1.connect_input('in_b', s3)
+    assert(nor1.is_on)
+    s3.flip()
+    assert(not nor1.is_on)
 
 
 def test_unstable_recursion():
