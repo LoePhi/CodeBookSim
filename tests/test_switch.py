@@ -1,4 +1,4 @@
-from switchsimulator.singlestatecomp import Switch
+from switchsimulator.corecomponents import Switch
 
 
 def test_a():

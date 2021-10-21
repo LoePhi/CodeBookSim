@@ -1,74 +1,70 @@
 from component import ElectricComponent
-from corecomponents import LooseWire, INV, OR, AND, Switch
+from corecomponents import LooseWire, INV, OR, AND
 
 
 class IntegratedComponent(ElectricComponent):
 
-    def compute_state(self):
-        raise NotImplementedError("nocomp")
-
-    def build_circuit(self):
-        pass
+    # TODOTHIS
+    def add_connection(self, con, port):
+        """
+        The connection is passed on until a corecomponent is found
+        """
+        for out in self.outputs:
+            getattr(self, out).add_connection(con, port)
 
 
 class ICSingleLine(IntegratedComponent):
-    def get_state(self, port="out_a"):
+
+    def get_state(self, port="out_main"):
         return getattr(self, port).get_state(port)
 
     is_on = property(get_state)
-
-    # TODOTHIS
-    def add_connection(self, con, port):
-        """Called by downstream elements to add the as a forward connection"""
-        self.out_a.add_connection((con, port))
 
 
 class NAND(ICSingleLine):
     """NAND-Gate"""
 
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
-    outputs = ElectricComponent.unpack_io('out_a')
+    outputs = ElectricComponent.unpack_io('out_main')
 
     def __init__(self, in_a: ElectricComponent = LooseWire(),
                  in_b: ElectricComponent = LooseWire()):
         self.in_a = in_a
         self.in_b = in_b
         self.AND1 = AND(self.in_a, self.in_b)
-        self.out_a = INV(self.AND1)
+        self.out_main = INV(self.AND1)
 
 
-a = Switch(True)
-b = Switch(False)
-nand1 = NAND(a, b)
-nand2 = NAND(nand1, a)
-nand1.is_on  # T
-nand2.is_on  # F
-
-or1 = OR(a, b)  # T
-nand3 = NAND(nand1, or1)
-nand3.is_on  # F
-b.flip()
-nand3.is_on  # T
-
-# waruzm hat 
-nand1.out_a.forward_connections[0][0].__dict__
-# keine backward connection zu 
-nand1.out_a.__dict__
-
-# 
-
-class NOR(LogicGate):
+class NOR(ICSingleLine):
     """NOR-Gate"""
 
-    def build_circuit(self):
+    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
+    outputs = ElectricComponent.unpack_io('out_main')
+
+    def __init__(self, in_a: ElectricComponent = LooseWire(),
+                 in_b: ElectricComponent = LooseWire()):
+        self.in_a = in_a
+        self.in_b = in_b
         self.OR1 = OR(self.in_a, self.in_b)
-        self._output = INV(self.OR1)
+        self.out_main = INV(self.OR1)
 
 
-class XOR(LogicGate):
+class XOR(ICSingleLine):
     """XOR-Gate"""
 
-    def build_circuit(self):
+    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
+    outputs = ElectricComponent.unpack_io('out_main')
+
+    def __init__(self, in_a: ElectricComponent = LooseWire(),
+                 in_b: ElectricComponent = LooseWire()):
+        self.in_a = in_a
+        self.in_b = in_b
         self.OR1 = OR(self.in_a, self.in_b)
         self.NAND1 = NAND(self.in_a, self.in_b)
-        self._output = AND(self.OR1, self.NAND1)
+        self.out_main = AND(self.OR1, self.NAND1)
+
+from corecomponents import Switch
+a = Switch(True)
+b=Switch(True)
+and1 = AND(a,b)
+or1 = OR(and1, b)

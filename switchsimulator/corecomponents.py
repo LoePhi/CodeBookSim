@@ -8,10 +8,10 @@ class CoreComponent(ElectricComponent):
     other components are assembled from
 
     All core components have a singlaur output-line
-    called 'out_a'
+    called 'out_main'
     """
 
-    outputs = ElectricComponent.unpack_io('out_a', )
+    outputs = ElectricComponent.unpack_io('out_main', )
 
     def setup(self):
         self.forward_connections = []
@@ -19,11 +19,32 @@ class CoreComponent(ElectricComponent):
         self.build_circuit()
         self.compute_state()
 
-    def get_state(self, port="out_a"):
+    def get_state(self, port="out_main"):
         """Returns the current state of the output(s)"""
         return getattr(self, port)
-        
+
     is_on = property(get_state)
+
+    def add_connection(self, con, port):
+        """Called by downstream elements to add the as a forward connection"""
+        if (con, port) not in self.forward_connections:
+            self.forward_connections.append((con, port))
+        # backward connections can be used for debugging the circuit
+        if self not in con.backward_connections:
+            con.backward_connections.append(self)
+
+    def forward_pass(self):
+        for fc in self.forward_connections:
+            fc[0].update()
+
+    # TODO: ?keep state
+    def update(self):
+        old_outputs = [getattr(self, o) for o in self.outputs.keys()]
+        self.compute_state()
+        new_outputs = [getattr(self, o) for o in self.outputs.keys()]
+        if old_outputs != new_outputs:
+            self.forward_pass()
+
 
 class Switch(CoreComponent):
     """
@@ -39,18 +60,18 @@ class Switch(CoreComponent):
         pass
 
     def compute_state(self):
-        self.out_a = self.closed
+        self.out_main = self.closed
 
     def flip(self):
-        self.out_a = not self.out_a
+        self.out_main = not self.out_main
         self.forward_pass()
 
     def open(self):
-        self.out_a = False
+        self.out_main = False
         self.forward_pass()
 
     def close(self):
-        self.out_a = True
+        self.out_main = True
         self.forward_pass()
 
 
@@ -73,7 +94,7 @@ class Connector(CoreComponent):
         self.in_a.add_connection(self, '_in_a')
 
     def compute_state(self):
-        self.out_a = self.in_a.get_state(self.port)
+        self.out_main = self.in_a.get_state(self.port)
 
 
 class LooseWire(CoreComponent):
@@ -85,7 +106,7 @@ class LooseWire(CoreComponent):
     # HACK: This makes LooseWire() cretae new instances
     # when used as default function paramter. Might not be needed
     # when/if all arguments are parsed
-    __slots__ = ['out_a']
+    __slots__ = ['out_main']
 
     def __init__(self):
         self.setup()
@@ -94,7 +115,7 @@ class LooseWire(CoreComponent):
         pass
 
     def compute_state(self):
-        self.out_a = False
+        self.out_main = False
 
 
 class INV(CoreComponent):
@@ -110,7 +131,7 @@ class INV(CoreComponent):
         self.in_a.add_connection(self, 'in_a')
 
     def compute_state(self):
-        self.out_a = not self.in_a.get_state()
+        self.out_main = not self.in_a.get_state()
 
 
 class AND(CoreComponent):
@@ -129,7 +150,7 @@ class AND(CoreComponent):
         self.in_b.add_connection(self, 'in_b')
 
     def compute_state(self):
-        self.out_a = self.in_a.get_state() and self.in_b.get_state()
+        self.out_main = self.in_a.get_state() and self.in_b.get_state()
 
 
 class OR(CoreComponent):
@@ -148,4 +169,4 @@ class OR(CoreComponent):
         self.in_b.add_connection(self, 'in_b')
 
     def compute_state(self):
-        self.out_a = self.in_a.get_state() or self.in_b.get_state()
+        self.out_main = self.in_a.get_state() or self.in_b.get_state()

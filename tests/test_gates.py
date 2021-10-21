@@ -1,6 +1,6 @@
 import pytest
-from switchsimulator.singlestatecomp import Switch
-from switchsimulator.logicgates import INV, AND, OR, NAND, XOR, NOR
+from switchsimulator.corecomponents import Switch, INV, AND, OR
+from switchsimulator.logicgates import NAND, XOR, NOR
 
 
 s1 = Switch(True)

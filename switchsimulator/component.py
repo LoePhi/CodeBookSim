@@ -51,22 +51,27 @@ class ElectricComponent(ABC):
         # Not functional, just for tracking
         setattr(self, input_name, input_circuit)
 
-    def add_connection(self, con, port):
-        """Called by downstream elements to add the as a forward connection"""
-        if con not in self.forward_connections:
-            self.forward_connections.append((con, port))
-        # backward connections can be used for debugging the circuit
-        if self not in con.backward_connections:
-            con.backward_connections.append(self)
+    def __repr__(self):
 
-    def forward_pass(self):
-        for fc in self.forward_connections:
-            fc[0].update()
+        def object_to_str(o):
+            return str(type(o).__name__) + ' @ ' + hex(id(o))
 
-    # TODO: ?keep state
-    def update(self):
-        old_outputs = [getattr(self, o) for o in self.outputs.keys()]
-        self.compute_state()
-        new_outputs = [getattr(self, o) for o in self.outputs.keys()]
-        if old_outputs != new_outputs:
-            self.forward_pass()
+        def list_item_to_str(item):
+            if isinstance(item, ElectricComponent):
+                return object_to_str(item)
+            elif isinstance(item, tuple):  # forward_connections are stored as tuples
+                return object_to_str(item[0]) + ' <--> ' + item[1]
+            else:
+                raise NotImplementedError('What list is this?')
+
+        selfdict = self.__dict__
+        prtl = [object_to_str(self)]
+        for k in selfdict.keys():
+            if(isinstance(selfdict[k], ElectricComponent)):
+                prtl.append(k + ': ' + object_to_str(selfdict[k]))
+            elif(isinstance(selfdict[k], list)):
+                prtl.append(
+                    k + ': [' + ', '.join([list_item_to_str(item) for item in selfdict[k]]) + ']')
+            else:
+                prtl.append(k + ': ' + str(selfdict[k]))
+        return '\n'.join(prtl)
