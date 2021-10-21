@@ -19,9 +19,9 @@ class CoreComponent(ElectricComponent):
         self.build_circuit()
         self.compute_state()
 
-    def get_state(self, port="out_main"):
+    def get_state(self):
         """Returns the current state of the output(s)"""
-        return getattr(self, port)
+        return self.out_main
 
     is_on = property(get_state)
 

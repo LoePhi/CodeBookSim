@@ -1,3 +1,4 @@
+from corecomponents import Switch
 from component import ElectricComponent
 from corecomponents import LooseWire, INV, OR, AND
 
@@ -12,11 +13,14 @@ class IntegratedComponent(ElectricComponent):
         for out in self.outputs:
             getattr(self, out).add_connection(con, port)
 
+    def get_state():
+        raise NotImplementedError
+
 
 class ICSingleLine(IntegratedComponent):
 
-    def get_state(self, port="out_main"):
-        return getattr(self, port).get_state(port)
+    def get_state(self):
+        return self.out_main.get_state()
 
     is_on = property(get_state)
 
@@ -63,8 +67,8 @@ class XOR(ICSingleLine):
         self.NAND1 = NAND(self.in_a, self.in_b)
         self.out_main = AND(self.OR1, self.NAND1)
 
-from corecomponents import Switch
+
 a = Switch(True)
-b=Switch(True)
-and1 = AND(a,b)
+b = Switch(True)
+and1 = AND(a, b)
 or1 = OR(and1, b)

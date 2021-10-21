@@ -18,13 +18,9 @@ class ElectricComponent(ABC):
     # inputs = unpack_io()
     # outputs = unpack_io()
 
-    @abstractmethod
-    def __init__(self):
-        """Attach Inputs"""
-
-    def get_state(self, port):
-        """Returns the current state of the output(s)"""
-        return getattr(self, port)
+    # def get_state(self, port):
+    #     """Returns the current state of the output(s)"""
+    #     return getattr(self, port)
 
     def connect_input(self, input_name: str,
                       input_circuit: 'ElectricComponent'):
