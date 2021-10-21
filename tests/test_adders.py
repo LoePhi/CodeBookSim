@@ -78,9 +78,12 @@ def test_Eight_Bit_Adder_connect_input():
 
 
 def test_Sixteen_Bit_Adder():
+    s1 = Switch(True)
     sba1 = Sixteen_Bit_Adder(bts('1000000000000001'),
-                             bts('1000000000000001'), Switch(True))
-    assert(sba1.__str__() == '0_0000000100000011')
+                                bts('1000000000000001'), s1)
+    assert(sba1.__str__() == '1_0000000000000011')
+    s1.flip()
+    assert(sba1.__str__() == '1_0000000000000010')
 
 
 def test_AddMin():

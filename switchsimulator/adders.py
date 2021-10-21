@@ -80,17 +80,15 @@ class Sixteen_Bit_Adder(ElectricComponent):
         self.in_b = in_b
         self.in_carry = in_carry
         self.eba_low = Eight_Bit_Adder(
-            self.in_a[:8], self.in_b[:8], self.in_carry)
+            self.in_a[8:], self.in_b[8:], self.in_carry)
         self.eba_high = Eight_Bit_Adder(
-            self.in_a[8:], self.in_b[8:], self.eba_low.out_carry)
-
-    def compute_state(self):
-        self.out_sum = self.eba_low.con_sum.is_on + self.eba_high.con_sum.is_on
-        self.out_carry = self.eba_high.con_carry.is_on
+            self.in_a[:8], self.in_b[:8], self.eba_low.out_carry)
+        self.out_sum = self.eba_high.out_sum + self.eba_low.out_sum
+        self.out_carry = self.eba_high.out_carry
 
     def __str__(self):
-        bitlist = [str(int(self.out_carry))] + ['_'] + \
-            [str(int(b)) for b in self.out_sum]
+        bitlist = [str(int(self.out_carry.is_on))] + ['_'] + \
+            [str(int(b.is_on)) for b in self.out_sum]
         return ''.join(bitlist)
 
 
@@ -112,13 +110,15 @@ class AddMin(ElectricComponent):
 
     def build_circuit(self):
         self.oc1 = OnesComplement(self.in_b, self.in_sub)
-        self.eba1 = Eight_Bit_Adder(self.in_a, self.oc1, self.in_sub)
+        self.eba1 = Eight_Bit_Adder(
+            self.in_a, self.oc1.con_main, self.in_sub)
         self.xor1 = XOR(self.eba1.con_carry, self.in_sub)
-        self.eba1.con_sum.add_connection(self, "out_sum")
+        for i in range(8):
+            self.eba1.con_sum[i].add_connection(self, "out_sum")
         self.xor1.add_connection(self, "out_flow")
 
     def compute_state(self):
-        self.out_sum = self.eba1.con_sum.is_on
+        self.out_sum = [con.is_on for con in self.eba1.con_sum]
         self.out_flow = self.xor1.is_on
 
     def __str__(self):
@@ -131,9 +131,9 @@ class AddMin(ElectricComponent):
         bitlist = [control] + [str(int(b)) for b in self.out_sum]
         return ''.join(bitlist)
 
-from helpers import bts
+# from helpers import bts
 
-AddMin(bts('00000001'), bts('00000001'), Switch(False))
+# AddMin(bts('00000001'), bts('00000001'), Switch(False))
 
-oc1 = OnesComplement(bts('00000001'),Switch(True))
-oc1.__dict__
+# oc1 = OnesComplement(bts('00000001'),Switch(True))
+# oc1.__dict__
