@@ -75,26 +75,26 @@ class Switch(CoreComponent):
         self.forward_pass()
 
 
-class Connector(CoreComponent):
-    """
-    The connector is used for addressing indiviudal output lines
-    of components that feauture multiple outputs.
-    """
-    # TODO: hier comupte und so überarbeiten
-    # alle anderen core-elemnte haben nur bool out
+# class Connector(CoreComponent):
+#     """
+#     The connector is used for addressing indiviudal output lines
+#     of components that feauture multiple outputs.
+#     """
+#     # TODO: hier comupte und so überarbeiten
+#     # alle anderen core-elemnte haben nur bool out
 
-    inputs = ElectricComponent.unpack_io('in_a')
+#     inputs = ElectricComponent.unpack_io('in_a')
 
-    def __init__(self, in_a: ElectricComponent, port: str):
-        self.in_a = in_a
-        self.port = port
-        self.setup()
+#     def __init__(self, in_a: ElectricComponent, port: str):
+#         self.in_a = in_a
+#         self.port = port
+#         self.setup()
 
-    def build_circuit(self):
-        self.in_a.add_connection(self, '_in_a')
+#     def build_circuit(self):
+#         self.in_a.add_connection(self, '_in_a')
 
-    def compute_state(self):
-        self.out_main = self.in_a.get_state(self.port)
+#     def compute_state(self):
+#         self.out_main = self.in_a.get_state(self.port)
 
 
 class LooseWire(CoreComponent):
@@ -131,7 +131,7 @@ class INV(CoreComponent):
         self.in_a.add_connection(self, 'in_a')
 
     def compute_state(self):
-        self.out_main = not self.in_a.get_state()
+        self.out_main = False if self.in_a.is_on else True
 
 
 class AND(CoreComponent):
@@ -150,7 +150,10 @@ class AND(CoreComponent):
         self.in_b.add_connection(self, 'in_b')
 
     def compute_state(self):
-        self.out_main = self.in_a.get_state() and self.in_b.get_state()
+        self.out_main = False
+        if self.in_a.is_on:
+            if self.in_b.is_on:
+                self.out_main = True
 
 
 class OR(CoreComponent):
@@ -169,4 +172,8 @@ class OR(CoreComponent):
         self.in_b.add_connection(self, 'in_b')
 
     def compute_state(self):
-        self.out_main = self.in_a.get_state() or self.in_b.get_state()
+        self.out_main = False
+        if self.in_a.is_on:
+            self.out_main = True
+        if self.in_b.is_on:
+            self.out_main = True

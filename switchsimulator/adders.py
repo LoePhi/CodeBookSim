@@ -1,10 +1,10 @@
 from component import ElectricComponent
 from corecomponents import LooseWire, OR, AND
-from logicgates import XOR
+from logicgates import XOR, IntegratedComponent
 from misccomp import OnesComplement
 
 
-class HalfAdder(ElectricComponent):
+class HalfAdder(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
     outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
@@ -20,7 +20,7 @@ class HalfAdder(ElectricComponent):
         return str(int(self.out_carry.is_on)) + str(int(self.out_sum.is_on))
 
 
-class FullAdder(ElectricComponent):
+class FullAdder(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_a', 'in_b', 'in_carry')
     outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
@@ -40,7 +40,7 @@ class FullAdder(ElectricComponent):
         return str(int(self.out_carry.is_on)) + str(int(self.out_sum.is_on))
 
 
-class Eight_Bit_Adder(ElectricComponent):
+class Eight_Bit_Adder(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_carry')
     outputs = ElectricComponent.unpack_io('out_sum:8', 'out_carry')
@@ -67,7 +67,7 @@ class Eight_Bit_Adder(ElectricComponent):
         return ''.join(bitlist)
 
 
-class Sixteen_Bit_Adder(ElectricComponent):
+class Sixteen_Bit_Adder(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_a:16', 'in_b:16', 'in_carry')
     outputs = ElectricComponent.unpack_io('out_sum:16', 'out_carry')
@@ -92,7 +92,7 @@ class Sixteen_Bit_Adder(ElectricComponent):
         return ''.join(bitlist)
 
 
-class AddMin(ElectricComponent):
+class AddMin(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_sub')
     outputs = ElectricComponent.unpack_io('out_sum:8', 'out_flow')

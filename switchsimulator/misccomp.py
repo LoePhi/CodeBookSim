@@ -1,9 +1,10 @@
 from component import ElectricComponent
-from singlestatecomp import LooseWire
-from logicgates import XOR
+from corecomponents import LooseWire
+from logicgates import XOR, IntegratedComponent
 
 
-class OnesComplement(ElectricComponent):
+# TODO: bessere namen für in-, outputs; v.a. _output ersetzen
+class OnesComplement(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_in:8', 'in_invert')
     outputs = ElectricComponent.unpack_io('_outline:8')
@@ -13,16 +14,8 @@ class OnesComplement(ElectricComponent):
                  in_invert: ElectricComponent = LooseWire()):
         self.in_in = in_in
         self.in_invert = in_invert
-        self.setup()
-
-    def build_circuit(self):
-        self.xors = [XOR(inp, self.in_invert) for inp in self.in_in]
-        for xor in self.xors:
-            xor.add_connection(self, '_outline')
-
-    def compute_state(self):
-        self._outline = [xor.is_on for xor in self.xors]
+        self.out_main = [XOR(inp, self.in_invert) for inp in self.in_in]
 
     def __str__(self):
-        bitlist = [str(int(b)) for b in self._outline]
+        bitlist = [str(int(b.is_on)) for b in self.out_main]
         return ''.join(bitlist)

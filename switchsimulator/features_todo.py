@@ -1,8 +1,9 @@
 # flake8: noqa
 
+# TODO: Integrated Component an der richtigen Stelle unterbreingen
+
 # TODO: Input-Handling
-# Inputs automatisch umwandeln (eg '1',1,'1010' -> Switch(T), S(T), [S(T), S(F), ..])
-# Dabei evtl. auch den default-Input verändern. Im Moment erzeugen die
+# Im Moment erzeugen die
 # LooseWire()-Defaults nur deshalb eigene Instanzen weil __slots__ in
 # LooseWire gesetzt ist. Das ist von außen aber nicht ersichtlich
 
@@ -11,6 +12,7 @@
 # es muss aber arauf geachtet werden, dass es immer noch möglich ist
 # weitere Argumente zu übergeben (wie zb in connector) bzw. muss sichergestellt werden,
 # dass es sich nur um tatsächliche inputs handelt -> input-tuple
+
 
 def my_dec(func):
     def inner(*args, **kwargs):
@@ -30,15 +32,6 @@ def hihi(a=None, b=None):
 
 hihi(2, b=3)
 
-# Alternative: setup benutzen -> allerdings müsste ElectricComponent dafür LooseWire kennen
-
-
-# TODO?: by default für alle outputs connectors erzeugen?
-# + weniger getipsel
-# - unnötige connectoren für singlestatecomponents
-# - schlechter ersichtlich was genau beim bau des circuits passiert,
-#       auch weil die ssc-connectoren erstmal nicht benutzt werden
-# + einheitliches interface für automatisierungen
 
 # TODO: __repr__ mit pretty printing
 
@@ -51,13 +44,6 @@ hihi(2, b=3)
 # -> bsp. 8bitadder: bisher löst jede änderung eines bits eine Kaskade für sich aus
 # durch queue könnten alle gemeinsam erfolgen
 # !Auf Reihenfolge der bits achten! lsb zuerst
-
-# TODO: out-connectors können aus der output-liste erzeugt werden, egal ob benutzt oder nicht
-
-# TODO: forward_connections zu _output, out_carry, etc. mit anderem Namen kennzeichnen (z.B. <class>_carry)
-# -> auch damit es einen Fhler gibt wenn versucht wird dem einen neuen Input zuzuweisen
-
-# TODO: bessere namen für in-, outputs; v.a. _output ersetzen
 
 # TODO: helpers -> überlegen wie weit ich hier abstrahieren möchte (zb selebr zwischen systemen kovertieren)
 # -> dann gute namen finden, richtig funktionen auswählen und tests schreiben

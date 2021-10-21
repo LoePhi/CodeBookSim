@@ -1,4 +1,4 @@
-from switchsimulator.singlestatecomp import Switch
+from switchsimulator.corecomponents import Switch
 from switchsimulator.misccomp import OnesComplement
 from switchsimulator.helpers import bts
 

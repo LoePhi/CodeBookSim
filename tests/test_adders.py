@@ -86,10 +86,10 @@ def test_Sixteen_Bit_Adder():
     assert(sba1.__str__() == '1_0000000000000010')
 
 
-def test_AddMin():
-    am = AddMin(bts('00000001'), bts('00000001'), Switch(False))
-    assert(eba1.__str__() == '0_00000010')
-    eba2 = Eight_Bit_Adder(bts('00000001'), bts('00000001'), Switch(True))
-    assert(eba2.__str__() == '0_00000011')
-    eba3 = Eight_Bit_Adder(bts('10000001'), bts('10000001'), Switch(True))
-    assert(eba3.__str__() == '1_00000011')
+# def test_AddMin():
+#     am = AddMin(bts('00000001'), bts('00000001'), Switch(False))
+#     assert(eba1.__str__() == '0_00000010')
+#     eba2 = Eight_Bit_Adder(bts('00000001'), bts('00000001'), Switch(True))
+#     assert(eba2.__str__() == '0_00000011')
+#     eba3 = Eight_Bit_Adder(bts('10000001'), bts('10000001'), Switch(True))
+#     assert(eba3.__str__() == '1_00000011')
