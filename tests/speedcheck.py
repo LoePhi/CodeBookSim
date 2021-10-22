@@ -1,6 +1,7 @@
 # flake8: noqa
 import cProfile
-from switchsimulator.singlestatecomp import Switch
+import switchsimulator
+from switchsimulator.corecomponents import Switch
 from switchsimulator.adders import Sixteen_Bit_Adder
 from switchsimulator.helpers import bts
 

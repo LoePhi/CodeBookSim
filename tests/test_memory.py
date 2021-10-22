@@ -21,9 +21,9 @@ def test_rs_flipflop():
 
 
 def test_dt_flipflop():
-    c = Switch(True)
     d = Switch(False)
-    ff = DTFlipFlop(c, d)
+    c = Switch(True)
+    ff = DTFlipFlop(d, c)
     assert(ff.__str__() == '01')
     c.open()
     assert(ff.__str__() == '01')
