@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 
 class ElectricComponent(ABC):
@@ -54,7 +54,7 @@ class ElectricComponent(ABC):
         def list_item_to_str(item):
             if isinstance(item, ElectricComponent):
                 return object_to_str(item)
-            elif isinstance(item, tuple):  # forward_connections are stored as tuples
+            elif isinstance(item, tuple):  # forward_con stored as tuples
                 return object_to_str(item[0]) + ' <--> ' + item[1]
             else:
                 raise NotImplementedError('What list is this?')
@@ -65,8 +65,9 @@ class ElectricComponent(ABC):
             if(isinstance(selfdict[k], ElectricComponent)):
                 prtl.append(k + ': ' + object_to_str(selfdict[k]))
             elif(isinstance(selfdict[k], list)):
-                prtl.append(
-                    k + ': [' + ', '.join([list_item_to_str(item) for item in selfdict[k]]) + ']')
+                prtl.append(k + ': [' + ', '.join(
+                        [list_item_to_str(item) for item in selfdict[k]]
+                        ) + ']')
             else:
                 prtl.append(k + ': ' + str(selfdict[k]))
         return '\n'.join(prtl)

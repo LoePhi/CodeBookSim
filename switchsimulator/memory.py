@@ -1,8 +1,6 @@
-from helpers import bts
-from corecomponents import Switch
 from electriccomponent import ElectricComponent
 from integratedcomponent import IntegratedComponent
-from corecomponents import LooseWire, AND, INV, Switch
+from corecomponents import LooseWire, AND, INV
 from logicgates import NOR
 
 
@@ -12,10 +10,10 @@ class RSFlipFlop(IntegratedComponent):
     outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
 
     def __init__(self,
-                 in_r: ElectricComponent = LooseWire(),
-                 in_s: ElectricComponent = LooseWire()):
-        self.in_r = in_r
-        self.in_s = in_s
+                 in_r=None,
+                 in_s=None):
+        self.in_r = in_r if in_r is not None else LooseWire()
+        self.in_s = in_s if in_s is not None else LooseWire()
         self.nor1 = NOR(self.in_r)
         self.nor2 = NOR(self.nor1, self.in_s)
         self.nor1.connect_input("in_b", self.nor2)
@@ -34,10 +32,10 @@ class DTFlipFlop(IntegratedComponent):
     outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
 
     def __init__(self,
-                 in_data: ElectricComponent = LooseWire(),
-                 in_clock: ElectricComponent = LooseWire()):
-        self.in_data = in_data
-        self.in_clock = in_clock
+                 in_data=None,
+                 in_clock=None):
+        self.in_data = in_data if in_data is not None else LooseWire()
+        self.in_clock = in_clock if in_clock is not None else LooseWire()
         self.and1 = AND(INV(self.in_data), self.in_clock)
         self.and2 = AND(self.in_data, self.in_clock)
         self.rsff1 = RSFlipFlop(self.and1, self.and2)
@@ -63,17 +61,3 @@ class EightBitLatch(IntegratedComponent):
 
     def __str__(self):
         return ''.join([str(int(q.is_on)) for q in self.out_q])
-
-
-c = Switch(True)
-eba1 = EightBitLatch(bts('01010101'), c)
-print(eba1)
-c.flip()
-print(eba1)
-
-
-d = Switch(True)
-c = Switch(False)
-dt1 = DTFlipFlop(d, c)
-print(dt1.out_q.is_on)
-c.flip()

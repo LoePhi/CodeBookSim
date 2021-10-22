@@ -1,6 +1,7 @@
 import pytest
 from switchsimulator.corecomponents import Switch
-from switchsimulator.memory import RSFlipFlop, DTFlipFlop
+from switchsimulator.memory import RSFlipFlop, DTFlipFlop, EightBitLatch
+from switchsimulator.helpers import bts
 
 
 def test_rs_flipflop():
@@ -37,3 +38,18 @@ def test_dt_flipflop():
     assert(ff.__str__() == '10')
     c.close()
     assert(ff.__str__() == '01')
+
+
+def test_eight_bit_latch():
+    clock = Switch(True)
+    data = bts('01010101')
+    ebl1 = EightBitLatch(data, clock)
+    assert(ebl1.__str__() == '01010101')
+    clock.flip()
+    assert(ebl1.__str__() == '01010101')
+    data[0].flip()
+    assert(ebl1.__str__() == '01010101')
+    ebl2 = EightBitLatch(data, clock)
+    clock.flip()
+    assert(ebl1.__str__() == '11010101')
+    assert(ebl2.__str__() == '11010101')

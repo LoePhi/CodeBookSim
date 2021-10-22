@@ -10,10 +10,10 @@ class HalfAdder(IntegratedComponent):
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
     outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(),
-                 in_b: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
+    def __init__(self, in_a: ElectricComponent = None,
+                 in_b: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else LooseWire()
+        self.in_b = in_b if in_b is not None else LooseWire()
         self.out_sum = XOR(self.in_a, self.in_b)
         self.out_carry = AND(self.in_a, self.in_b)
 
@@ -26,12 +26,12 @@ class FullAdder(IntegratedComponent):
     inputs = ElectricComponent.unpack_io('in_a', 'in_b', 'in_carry')
     outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(),
-                 in_b: ElectricComponent = LooseWire(),
-                 in_carry: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
-        self.in_carry = in_carry
+    def __init__(self, in_a: ElectricComponent = None,
+                 in_b: ElectricComponent = None,
+                 in_carry: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else LooseWire()
+        self.in_b = in_b if in_b is not None else LooseWire()
+        self.in_carry = in_carry if in_carry is not None else LooseWire()
         self.HA1 = HalfAdder(self.in_a, self.in_b)
         self.HA2 = HalfAdder(self.in_carry, self.HA1.out_sum)
         self.out_sum = self.HA2.out_sum
@@ -47,12 +47,14 @@ class Eight_Bit_Adder(IntegratedComponent):
     outputs = ElectricComponent.unpack_io('out_sum:8', 'out_carry')
 
     def __init__(self,
-                 in_a: ElectricComponent = [LooseWire() for x in range(8)],
-                 in_b: ElectricComponent = [LooseWire() for x in range(8)],
-                 in_carry: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
-        self.in_carry = in_carry
+                 in_a: list = None,
+                 in_b: list = None,
+                 in_carry: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else [
+            LooseWire() for x in range(8)]
+        self.in_b = in_b if in_b is not None else [
+            LooseWire() for x in range(8)]
+        self.in_carry = in_carry if in_carry is not None else LooseWire()
         self.full_adders = [None]*8
         self.full_adders[7] = FullAdder(
             self.in_a[7], self.in_b[7], self.in_carry)
@@ -74,12 +76,14 @@ class Sixteen_Bit_Adder(IntegratedComponent):
     outputs = ElectricComponent.unpack_io('out_sum:16', 'out_carry')
 
     def __init__(self,
-                 in_a: ElectricComponent = [LooseWire() for x in range(16)],
-                 in_b: ElectricComponent = [LooseWire() for x in range(16)],
-                 in_carry: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
-        self.in_carry = in_carry
+                 in_a: list = None,
+                 in_b: list = None,
+                 in_carry: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else [
+            LooseWire() for x in range(16)]
+        self.in_b = in_b if in_b is not None else [
+            LooseWire() for x in range(16)]
+        self.in_carry = in_carry if in_carry is not None else LooseWire()
         self.eba_low = Eight_Bit_Adder(
             self.in_a[8:], self.in_b[8:], self.in_carry)
         self.eba_high = Eight_Bit_Adder(
@@ -99,12 +103,14 @@ class AddMin(IntegratedComponent):
     outputs = ElectricComponent.unpack_io('out_sum:8', 'out_flow')
 
     def __init__(self,
-                 in_a: ElectricComponent = [LooseWire() for x in range(8)],
-                 in_b: ElectricComponent = [LooseWire() for x in range(8)],
-                 in_sub: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
-        self.in_sub = in_sub
+                 in_a: list = None,
+                 in_b: list = None,
+                 in_sub: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else [
+            LooseWire() for x in range(8)]
+        self.in_b = in_b if in_b is not None else [
+            LooseWire() for x in range(8)]
+        self.in_sub = in_sub if in_sub is not None else LooseWire()
         self.oc1 = OnesComplement(self.in_b, self.in_sub)
         self.eba1 = Eight_Bit_Adder(
             self.in_a, self.oc1.out_main, self.in_sub)

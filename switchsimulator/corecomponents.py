@@ -39,9 +39,10 @@ class CoreComponent(ElectricComponent):
 
     # TODO: ?keep state
     def update(self):
-        old_outputs = [getattr(self, o) for o in self.outputs.keys()]
+        ok = self.outputs.keys()
+        old_outputs = [getattr(self, o) for o in ok]
         self.compute_state()
-        new_outputs = [getattr(self, o) for o in self.outputs.keys()]
+        new_outputs = [getattr(self, o) for o in ok]
         if old_outputs != new_outputs:
             self.forward_pass()
 
@@ -81,11 +82,6 @@ class LooseWire(CoreComponent):
     It never carries a current
     """
 
-    # HACK: This makes LooseWire() cretae new instances
-    # when used as default function paramter. Might not be needed
-    # when/if all arguments are parsed
-    __slots__ = ['out_main']
-
     def __init__(self):
         self.setup()
 
@@ -101,8 +97,8 @@ class INV(CoreComponent):
 
     inputs = ElectricComponent.unpack_io('in_a', )
 
-    def __init__(self, in_a: ElectricComponent = LooseWire()):
-        self.in_a = in_a
+    def __init__(self, in_a: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else LooseWire()
         self.setup()
 
     def build_circuit(self):
@@ -110,6 +106,7 @@ class INV(CoreComponent):
 
     def compute_state(self):
         self.out_main = False if self.in_a.is_on else True
+        # self.out_main = not self.in_a.is_on
 
 
 class AND(CoreComponent):
@@ -117,10 +114,10 @@ class AND(CoreComponent):
 
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(),
-                 in_b: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
+    def __init__(self, in_a: ElectricComponent = None,
+                 in_b: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else LooseWire()
+        self.in_b = in_b if in_b is not None else LooseWire()
         self.setup()
 
     def build_circuit(self):
@@ -132,6 +129,7 @@ class AND(CoreComponent):
         if self.in_a.is_on:
             if self.in_b.is_on:
                 self.out_main = True
+        # self.out_main = self.in_a.is_on and self.in_b.is_on
 
 
 class OR(CoreComponent):
@@ -139,10 +137,10 @@ class OR(CoreComponent):
 
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(),
-                 in_b: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
+    def __init__(self, in_a: ElectricComponent = None,
+                 in_b: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else LooseWire()
+        self.in_b = in_b if in_b is not None else LooseWire()
         self.setup()
 
     def build_circuit(self):
@@ -155,3 +153,4 @@ class OR(CoreComponent):
             self.out_main = True
         if self.in_b.is_on:
             self.out_main = True
+#        self.out_main = self.in_a.is_on or self.in_b.is_on

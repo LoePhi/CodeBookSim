@@ -17,10 +17,10 @@ class IntegratedLogicGate(IntegratedComponent):
 class NAND(IntegratedLogicGate):
     """NAND-Gate"""
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(),
-                 in_b: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
+    def __init__(self, in_a: ElectricComponent = None,
+                 in_b: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else LooseWire()
+        self.in_b = in_b if in_b is not None else LooseWire()
         self.AND1 = AND(self.in_a, self.in_b)
         self.out_main = INV(self.AND1)
 
@@ -28,10 +28,10 @@ class NAND(IntegratedLogicGate):
 class NOR(IntegratedLogicGate):
     """NOR-Gate"""
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(),
-                 in_b: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
+    def __init__(self, in_a: ElectricComponent = None,
+                 in_b: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else LooseWire()
+        self.in_b = in_b if in_b is not None else LooseWire()
         self.OR1 = OR(self.in_a, self.in_b)
         self.out_main = INV(self.OR1)
 
@@ -39,10 +39,10 @@ class NOR(IntegratedLogicGate):
 class XOR(IntegratedLogicGate):
     """XOR-Gate"""
 
-    def __init__(self, in_a: ElectricComponent = LooseWire(),
-                 in_b: ElectricComponent = LooseWire()):
-        self.in_a = in_a
-        self.in_b = in_b
+    def __init__(self, in_a: ElectricComponent = None,
+                 in_b: ElectricComponent = None):
+        self.in_a = in_a if in_a is not None else LooseWire()
+        self.in_b = in_b if in_b is not None else LooseWire()
         self.OR1 = OR(self.in_a, self.in_b)
         self.NAND1 = NAND(self.in_a, self.in_b)
         self.out_main = AND(self.OR1, self.NAND1)
