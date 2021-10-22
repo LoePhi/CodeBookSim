@@ -1,4 +1,4 @@
-from component import ElectricComponent
+from electriccomponent import ElectricComponent
 
 
 class CoreComponent(ElectricComponent):
@@ -20,7 +20,7 @@ class CoreComponent(ElectricComponent):
         self.compute_state()
 
     def get_state(self):
-        """Returns the current state of the output(s)"""
+        """Returns the current state of the output"""
         return self.out_main
 
     is_on = property(get_state)
@@ -73,28 +73,6 @@ class Switch(CoreComponent):
     def close(self):
         self.out_main = True
         self.forward_pass()
-
-
-# class Connector(CoreComponent):
-#     """
-#     The connector is used for addressing indiviudal output lines
-#     of components that feauture multiple outputs.
-#     """
-#     # TODO: hier comupte und so überarbeiten
-#     # alle anderen core-elemnte haben nur bool out
-
-#     inputs = ElectricComponent.unpack_io('in_a')
-
-#     def __init__(self, in_a: ElectricComponent, port: str):
-#         self.in_a = in_a
-#         self.port = port
-#         self.setup()
-
-#     def build_circuit(self):
-#         self.in_a.add_connection(self, '_in_a')
-
-#     def compute_state(self):
-#         self.out_main = self.in_a.get_state(self.port)
 
 
 class LooseWire(CoreComponent):

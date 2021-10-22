@@ -80,16 +80,21 @@ def test_Eight_Bit_Adder_connect_input():
 def test_Sixteen_Bit_Adder():
     s1 = Switch(True)
     sba1 = Sixteen_Bit_Adder(bts('1000000000000001'),
-                                bts('1000000000000001'), s1)
+                             bts('1000000000000001'), s1)
     assert(sba1.__str__() == '1_0000000000000011')
     s1.flip()
     assert(sba1.__str__() == '1_0000000000000010')
 
 
-# def test_AddMin():
-#     am = AddMin(bts('00000001'), bts('00000001'), Switch(False))
-#     assert(eba1.__str__() == '0_00000010')
-#     eba2 = Eight_Bit_Adder(bts('00000001'), bts('00000001'), Switch(True))
-#     assert(eba2.__str__() == '0_00000011')
-#     eba3 = Eight_Bit_Adder(bts('10000001'), bts('10000001'), Switch(True))
-#     assert(eba3.__str__() == '1_00000011')
+def test_AddMin():
+    sub = Switch(False)
+    am1 = AddMin(bts('00000001'), bts('00000001'), sub)
+    assert(am1.__str__() == '00000010')
+    am2 = AddMin(bts('00000101'), bts('00000011'), sub)
+    assert(am2.__str__() == '00001000')
+    am3 = AddMin(bts('10000000'), bts('10000001'), sub)
+    assert(am3.__str__() == 'OvErFlOw00000001')
+    sub.flip()
+    assert(am1.__str__() == '00000000')
+    assert(am2.__str__() == '00000010')
+    assert('UnDeRfLoW' in am3.__str__())

@@ -1,6 +1,7 @@
-from component import ElectricComponent
+from electriccomponent import ElectricComponent
+from integratedcomponent import IntegratedComponent
 from corecomponents import LooseWire
-from logicgates import XOR, IntegratedComponent
+from logicgates import XOR
 
 
 # TODO: bessere namen für in-, outputs; v.a. _output ersetzen

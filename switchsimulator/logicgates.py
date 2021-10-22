@@ -1,23 +1,12 @@
-from corecomponents import Switch
-from component import ElectricComponent
+from electriccomponent import ElectricComponent
+from integratedcomponent import IntegratedComponent
 from corecomponents import LooseWire, INV, OR, AND
 
 
-class IntegratedComponent(ElectricComponent):
+class IntegratedLogicGate(IntegratedComponent):
 
-    # TODOTHIS
-    def add_connection(self, con, port):
-        """
-        The connection is passed on until a corecomponent is found
-        """
-        for out in self.outputs:
-            getattr(self, out).add_connection(con, port)
-
-    def get_state():
-        raise NotImplementedError
-
-
-class ICSingleLine(IntegratedComponent):
+    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
+    outputs = ElectricComponent.unpack_io('out_main')
 
     def get_state(self):
         return self.out_main.get_state()
@@ -25,11 +14,8 @@ class ICSingleLine(IntegratedComponent):
     is_on = property(get_state)
 
 
-class NAND(ICSingleLine):
+class NAND(IntegratedLogicGate):
     """NAND-Gate"""
-
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
-    outputs = ElectricComponent.unpack_io('out_main')
 
     def __init__(self, in_a: ElectricComponent = LooseWire(),
                  in_b: ElectricComponent = LooseWire()):
@@ -39,11 +25,8 @@ class NAND(ICSingleLine):
         self.out_main = INV(self.AND1)
 
 
-class NOR(ICSingleLine):
+class NOR(IntegratedLogicGate):
     """NOR-Gate"""
-
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
-    outputs = ElectricComponent.unpack_io('out_main')
 
     def __init__(self, in_a: ElectricComponent = LooseWire(),
                  in_b: ElectricComponent = LooseWire()):
@@ -53,11 +36,8 @@ class NOR(ICSingleLine):
         self.out_main = INV(self.OR1)
 
 
-class XOR(ICSingleLine):
+class XOR(IntegratedLogicGate):
     """XOR-Gate"""
-
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
-    outputs = ElectricComponent.unpack_io('out_main')
 
     def __init__(self, in_a: ElectricComponent = LooseWire(),
                  in_b: ElectricComponent = LooseWire()):
@@ -66,9 +46,3 @@ class XOR(ICSingleLine):
         self.OR1 = OR(self.in_a, self.in_b)
         self.NAND1 = NAND(self.in_a, self.in_b)
         self.out_main = AND(self.OR1, self.NAND1)
-
-
-a = Switch(True)
-b = Switch(True)
-and1 = AND(a, b)
-or1 = OR(and1, b)

@@ -1,6 +1,7 @@
-from component import ElectricComponent
+from electriccomponent import ElectricComponent
 from corecomponents import LooseWire, OR, AND
-from logicgates import XOR, IntegratedComponent
+from integratedcomponent import IntegratedComponent
+from logicgates import XOR
 from misccomp import OnesComplement
 
 
@@ -104,36 +105,18 @@ class AddMin(IntegratedComponent):
         self.in_a = in_a
         self.in_b = in_b
         self.in_sub = in_sub
-        self.setup()
-        self.con_sum = Connector(self, "out_sum")
-        self.con_flow = Connector(self, "out_flow")
-
-    def build_circuit(self):
         self.oc1 = OnesComplement(self.in_b, self.in_sub)
         self.eba1 = Eight_Bit_Adder(
-            self.in_a, self.oc1.con_main, self.in_sub)
-        self.xor1 = XOR(self.eba1.con_carry, self.in_sub)
-        for i in range(8):
-            self.eba1.con_sum[i].add_connection(self, "out_sum")
-        self.xor1.add_connection(self, "out_flow")
-
-    def compute_state(self):
-        self.out_sum = [con.is_on for con in self.eba1.con_sum]
-        self.out_flow = self.xor1.is_on
+            self.in_a, self.oc1.out_main, self.in_sub)
+        self.out_sum = self.eba1.out_sum
+        self.out_flow = XOR(self.eba1.out_carry, self.in_sub)
 
     def __str__(self):
-        if not self.out_flow:
+        if not self.out_flow.is_on:
             control = ""
         elif self.in_sub.is_on:
             control = "UnDeRfLoW"
         else:
             control = "OvErFlOw"
-        bitlist = [control] + [str(int(b)) for b in self.out_sum]
+        bitlist = [control] + [str(int(b.is_on)) for b in self.out_sum]
         return ''.join(bitlist)
-
-# from helpers import bts
-
-# AddMin(bts('00000001'), bts('00000001'), Switch(False))
-
-# oc1 = OnesComplement(bts('00000001'),Switch(True))
-# oc1.__dict__
