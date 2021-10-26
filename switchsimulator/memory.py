@@ -1,7 +1,6 @@
 from electriccomponent import ElectricComponent
 from integratedcomponent import IntegratedComponent
-from corecomponents import LooseWire, AND, INV
-from logicgates import NOR
+from corecomponents import LooseWire, AND, INV, NOR
 
 
 class RSFlipFlop(IntegratedComponent):
@@ -26,7 +25,7 @@ class RSFlipFlop(IntegratedComponent):
         return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
 
 
-class DTFlipFlop(IntegratedComponent):
+class LevelTrigDTFlipFlop(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_data', 'in_clock')
     outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
@@ -46,7 +45,31 @@ class DTFlipFlop(IntegratedComponent):
         return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
 
 
-class EightBitLatch(IntegratedComponent):
+class EdgeTrigDTFlipFlop(IntegratedComponent):
+
+    inputs = ElectricComponent.unpack_io('in_data', 'in_clock')
+    outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
+
+    def __init__(self,
+                 in_data=None,
+                 in_clock=None):
+        self.in_data = in_data if in_data is not None else LooseWire()
+        self.in_clock = in_clock if in_clock is not None else LooseWire()
+        self.dtff1 = LevelTrigDTFlipFlop(
+            INV(self.in_data), INV(self.in_clock))
+        self.dtff2 = LevelTrigDTFlipFlop(self.dtff1.out_qb, self.in_clock)
+        self.out_q = self.dtff2.out_q
+        self.out_qb = self.dtff2.out_qb
+
+    def __str__(self):
+        return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+
+
+class EdgeTrigDTFlipFlopPreCl(IntegratedComponent):
+    pass
+
+
+class LevelTrig8BitLatch(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_data:8', 'in_clock')
     outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
@@ -56,7 +79,8 @@ class EightBitLatch(IntegratedComponent):
                  in_clock: ElectricComponent = LooseWire()):
         self.in_data = in_data
         self.in_clock = in_clock
-        self.dtfs = [DTFlipFlop(d, self.in_clock) for d in self.in_data]
+        self.dtfs = [LevelTrigDTFlipFlop(
+            d, self.in_clock) for d in self.in_data]
         self.out_q = [dtf.out_q for dtf in self.dtfs]
 
     def __str__(self):

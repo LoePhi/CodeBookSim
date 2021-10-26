@@ -39,12 +39,13 @@ class CoreComponent(ElectricComponent):
 
     # TODO: ?keep state
     def update(self):
-        ok = self.outputs.keys()
-        old_outputs = [getattr(self, o) for o in ok]
+        old_state = self.out_main
         self.compute_state()
-        new_outputs = [getattr(self, o) for o in ok]
-        if old_outputs != new_outputs:
+        if self.out_main != old_state:
             self.forward_pass()
+
+    def __str__(self):
+        return str(int(self.out_main))
 
 
 class Switch(CoreComponent):
@@ -109,8 +110,7 @@ class INV(CoreComponent):
         # self.out_main = not self.in_a.is_on
 
 
-class AND(CoreComponent):
-    """AND-Gate"""
+class BaseGate(CoreComponent):
 
     inputs = ElectricComponent.unpack_io('in_a', 'in_b')
 
@@ -123,6 +123,10 @@ class AND(CoreComponent):
     def build_circuit(self):
         self.in_a.add_connection(self, 'in_a')
         self.in_b.add_connection(self, 'in_b')
+
+
+class AND(BaseGate):
+    """AND-Gate"""
 
     def compute_state(self):
         self.out_main = False
@@ -132,20 +136,8 @@ class AND(CoreComponent):
         # self.out_main = self.in_a.is_on and self.in_b.is_on
 
 
-class OR(CoreComponent):
+class OR(BaseGate):
     """OR-Gate"""
-
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
-
-    def __init__(self, in_a: ElectricComponent = None,
-                 in_b: ElectricComponent = None):
-        self.in_a = in_a if in_a is not None else LooseWire()
-        self.in_b = in_b if in_b is not None else LooseWire()
-        self.setup()
-
-    def build_circuit(self):
-        self.in_a.add_connection(self, 'in_a')
-        self.in_b.add_connection(self, 'in_b')
 
     def compute_state(self):
         self.out_main = False
@@ -154,3 +146,24 @@ class OR(CoreComponent):
         if self.in_b.is_on:
             self.out_main = True
 #        self.out_main = self.in_a.is_on or self.in_b.is_on
+
+
+class NOR(BaseGate):
+    """NOR-Gate"""
+
+    def compute_state(self):
+        self.out_main = True
+        if self.in_a.is_on:
+            self.out_main = False
+        if self.in_b.is_on:
+            self.out_main = False
+
+
+class NAND(BaseGate):
+    """NAND-Gate"""
+
+    def compute_state(self):
+        self.out_main = True
+        if self.in_a.is_on:
+            if self.in_b.is_on:
+                self.out_main = False

@@ -1,6 +1,6 @@
 import pytest
-from switchsimulator.corecomponents import Switch, INV, AND, OR
-from switchsimulator.logicgates import NAND, XOR, NOR
+from switchsimulator.corecomponents import Switch, INV, AND, OR, NOR, NAND
+from switchsimulator.logicgates import XOR, NOR3
 
 
 s1 = Switch(True)
@@ -141,3 +141,22 @@ def test_unstable_recursion():
 
     with pytest.raises(RecursionError):
         s_up.flip()
+
+
+def test_nor3():
+    s1 = Switch(False)
+    s2 = Switch(False)
+    s3 = Switch(False)
+    s4 = Switch(True)
+    s5 = Switch(True)
+    s6 = Switch(True)
+    nor1 = NOR3(s1, s2, s3)
+    nor2 = NOR3(s6, s4, s5)
+    nor3 = NOR3(s3, s1, s2)
+    nor4 = NOR3(s3, s4, s2)
+    nor5 = NOR3(s6, s4, s2)
+    assert(nor1.is_on)
+    assert(not nor2.is_on)
+    assert(nor3.is_on)
+    assert(not nor4.is_on)
+    assert(not nor5.is_on)

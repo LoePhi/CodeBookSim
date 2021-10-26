@@ -7,5 +7,6 @@ class IntegratedComponent(ElectricComponent):
         """
         The connection is passed on until a corecomponent is found
         """
+        # TODO: work with lists
         for out in self.outputs:
             getattr(self, out).add_connection(con, port)

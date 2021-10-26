@@ -1,7 +1,5 @@
 # flake8: noqa
 
-# TODO: Integrated Component an der richtigen Stelle unterbreingen
-
 # TODO: Input-Handling
 # Im Moment erzeugen die
 # LooseWire()-Defaults nur deshalb eigene Instanzen weil __slots__ in
@@ -47,3 +45,10 @@ hihi(2, b=3)
 
 # TODO: helpers -> überlegen wie weit ich hier abstrahieren möchte (zb selebr zwischen systemen kovertieren)
 # -> dann gute namen finden, richtig funktionen auswählen und tests schreiben
+
+
+# List of not implemented circuits
+# Buffer, p. 128
+# oscillator, p. 157
+# Adding machines, p.168, p. 170
+# And3, p. 115 

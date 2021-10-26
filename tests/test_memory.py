@@ -1,6 +1,8 @@
 import pytest
 from switchsimulator.corecomponents import Switch
-from switchsimulator.memory import RSFlipFlop, DTFlipFlop, EightBitLatch
+from switchsimulator.memory import RSFlipFlop, LevelTrigDTFlipFlop
+from switchsimulator.memory import LevelTrig8BitLatch, EdgeTrigDTFlipFlop
+from switchsimulator.memory import EdgeTrigDTFlipFlopPreCl
 from switchsimulator.helpers import bts
 
 
@@ -21,10 +23,10 @@ def test_rs_flipflop():
         ff.__str__()
 
 
-def test_dt_flipflop():
+def test_lvlt_dt_flipflop():
     d = Switch(False)
     c = Switch(True)
-    ff = DTFlipFlop(d, c)
+    ff = LevelTrigDTFlipFlop(d, c)
     assert(ff.__str__() == '01')
     c.open()
     assert(ff.__str__() == '01')
@@ -40,16 +42,38 @@ def test_dt_flipflop():
     assert(ff.__str__() == '01')
 
 
+def test_edget_dt_flipflop():
+    s1 = Switch(True)
+    s2 = Switch(False)
+    c1 = Switch(True)
+    etdtff1 = EdgeTrigDTFlipFlop(s1, c1)
+    etdtff2 = EdgeTrigDTFlipFlop(s2, c1)
+    c1.flip()  # f
+    c1.flip()
+    assert(etdtff1.__str__() == '10')
+    assert(etdtff2.__str__() == '01')
+    s1.flip()
+    assert(etdtff1.__str__() == '10')
+    c1.flip()
+    assert(etdtff1.__str__() == '10')
+    assert(etdtff2.__str__() == '01')
+    s2.flip()
+    assert(etdtff2.__str__() == '01')
+    c1.flip()
+    assert(etdtff1.__str__() == '01')
+    assert(etdtff2.__str__() == '10')
+
+
 def test_eight_bit_latch():
     clock = Switch(True)
     data = bts('01010101')
-    ebl1 = EightBitLatch(data, clock)
+    ebl1 = LevelTrig8BitLatch(data, clock)
     assert(ebl1.__str__() == '01010101')
     clock.flip()
     assert(ebl1.__str__() == '01010101')
     data[0].flip()
     assert(ebl1.__str__() == '01010101')
-    ebl2 = EightBitLatch(data, clock)
+    ebl2 = LevelTrig8BitLatch(data, clock)
     clock.flip()
     assert(ebl1.__str__() == '11010101')
     assert(ebl2.__str__() == '11010101')
