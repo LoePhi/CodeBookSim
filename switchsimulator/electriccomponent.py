@@ -66,8 +66,8 @@ class ElectricComponent(ABC):
                 prtl.append(k + ': ' + object_to_str(selfdict[k]))
             elif(isinstance(selfdict[k], list)):
                 prtl.append(k + ': [' + ', '.join(
-                        [list_item_to_str(item) for item in selfdict[k]]
-                        ) + ']')
+                    [list_item_to_str(item) for item in selfdict[k]]
+                ) + ']')
             else:
                 prtl.append(k + ': ' + str(selfdict[k]))
         return '\n'.join(prtl)

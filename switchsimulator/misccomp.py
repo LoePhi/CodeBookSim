@@ -8,13 +8,14 @@ from logicgates import XOR
 class OnesComplement(IntegratedComponent):
 
     inputs = ElectricComponent.unpack_io('in_in:8', 'in_invert')
-    outputs = ElectricComponent.unpack_io('_outline:8')
+    outputs = ElectricComponent.unpack_io('out_main:8')
 
     def __init__(self,
-                 in_in: ElectricComponent = [LooseWire() for x in range(8)],
-                 in_invert: ElectricComponent = LooseWire()):
-        self.in_in = in_in
-        self.in_invert = in_invert
+                 in_in: ElectricComponent = None,
+                 in_invert: ElectricComponent = None):
+        self.in_in = in_in if in_in is not None else [
+            LooseWire() for x in range(8)]
+        self.in_invert = in_invert if in_invert is not None else LooseWire()
         self.out_main = [XOR(inp, self.in_invert) for inp in self.in_in]
 
     def __str__(self):

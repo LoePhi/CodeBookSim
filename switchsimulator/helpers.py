@@ -1,4 +1,6 @@
 import corecomponents as cc
+from corecomponents import LooseWire
+from functools import wraps
 
 
 def bin_to_switch(bin_str):
@@ -39,3 +41,49 @@ def bit_to_switch_tmp(bit8):
     """
 
     return [cc.Switch(bool(int(b))) for b in bit8]
+
+
+def _lwd(n=1):
+    """
+    ONLY for use with the @autoparse decorator
+    Generates default parameter values of specified size for
+    ElectricComponents
+    """
+    if n == 1:
+        return LooseWire()
+    else:
+        return [LooseWire() for _ in range(n)]
+
+
+def autoparse(init):
+    parnames = init.__code__.co_varnames[1:]
+    defaults = init.__defaults__
+
+    @wraps(init)
+    def wrapped_init(self, *args, **kwargs):
+
+        # Turn args into kwargs
+        kwargs.update(zip(parnames[:len(args)], args))
+
+        # apply default parameter values
+        default_start = len(parnames) - len(defaults)
+        for i in range(len(defaults)):
+            if parnames[default_start + i] not in kwargs:
+                kwargs[parnames[default_start + i]] = defaults[i]
+
+        # generate new instance for each LooseWire
+        for arg in kwargs:
+            if isinstance(kwargs[arg], LooseWire):
+                kwargs[arg] = LooseWire()
+            if isinstance(kwargs[arg], list):
+                for i in range(len(kwargs[arg])):
+                    if isinstance(kwargs[arg][i], LooseWire):
+                        kwargs[arg][i] = LooseWire()
+
+        # attach parameters to instance
+        for arg in kwargs:
+            setattr(self, arg, kwargs[arg])
+
+        init(self, **kwargs)
+
+    return wrapped_init
