@@ -8,7 +8,7 @@ import time
 class Buffer(CoreComponent):
     """Buffer"""
 
-    inputs = ElectricComponent.unpack_io('in_a', )
+    # inputs = ElectricComponent.unpack_io('in_a', )
 
     def __init__(self, in_a: ElectricComponent = None, delay: float = .1):
         self.in_a = in_a if in_a is not None else LooseWire()
@@ -28,7 +28,7 @@ class Buffer(CoreComponent):
 class Gate(CoreComponent):
     """Gate"""
 
-    inputs = ElectricComponent.unpack_io('in_a', )
+    # inputs = ElectricComponent.unpack_io('in_a', )
 
     def __init__(self, in_a: ElectricComponent = None, delay: float = .1):
         self.in_a = in_a if in_a is not None else LooseWire()

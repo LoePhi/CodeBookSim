@@ -1,12 +1,14 @@
 from electriccomponent import ElectricComponent
 from integratedcomponent import IntegratedComponent
 from corecomponents import LooseWire, AND, INV, NOR
+from helpers import _lwd, autoparse
+from logicgates import NOR3
 
 
 class RSFlipFlop(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_r', 'in_s')
-    outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
+    # inputs = ElectricComponent.unpack_io('in_r', 'in_s')
+    # outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
 
     def __init__(self,
                  in_r=None,
@@ -27,8 +29,8 @@ class RSFlipFlop(IntegratedComponent):
 
 class LevelTrigDTFlipFlop(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_data', 'in_clock')
-    outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
+    # inputs = ElectricComponent.unpack_io('in_data', 'in_clock')
+    # outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
 
     def __init__(self,
                  in_data=None,
@@ -47,8 +49,8 @@ class LevelTrigDTFlipFlop(IntegratedComponent):
 
 class EdgeTrigDTFlipFlop(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_data', 'in_clock')
-    outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
+    # inputs = ElectricComponent.unpack_io('in_data', 'in_clock')
+    # outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
 
     def __init__(self,
                  in_data=None,
@@ -66,19 +68,43 @@ class EdgeTrigDTFlipFlop(IntegratedComponent):
 
 
 class EdgeTrigDTFlipFlopPreCl(IntegratedComponent):
-    pass
+
+    @autoparse
+    def __init__(self,
+                 in_data: ElectricComponent = _lwd(),
+                 in_clock: ElectricComponent = _lwd(),
+                 in_preset: ElectricComponent = _lwd(),
+                 in_clear: ElectricComponent = _lwd()):
+        self.inv_c = INV(self.in_clock)
+
+        self.nor11 = NOR3(self.in_clear)
+        self.nor12 = NOR3(self.nor11, self.in_preset, self.inv_c)
+        self.nor13 = NOR3(self.nor12, self.inv_c)
+        self.nor14 = NOR3(self.nor13, self.in_preset, self.in_data)
+        self.nor11.connect_input('in_b', self.nor14)
+        self.nor11.connect_input('in_c', self.nor12)
+        self.nor13.connect_input('in_c', self.nor14)
+
+        self.nor21 = NOR3(self.in_clear, self.nor12)
+        self.nor22 = NOR3(self.nor21, self.in_preset, self.nor13)
+        self.nor21.connect_input('in_c', self.nor22)
+
+        self.out_q = self.nor21.out_main
+        self.out_qb = self.nor22.out_main
+
+    def __str__(self):
+        return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
 
 
 class LevelTrig8BitLatch(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_data:8', 'in_clock')
-    outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
+    # inputs = ElectricComponent.unpack_io('in_data:8', 'in_clock')
+    # outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
 
+    @autoparse
     def __init__(self,
-                 in_data: ElectricComponent = [LooseWire() for x in range(8)],
-                 in_clock: ElectricComponent = LooseWire()):
-        self.in_data = in_data
-        self.in_clock = in_clock
+                 in_data: list[ElectricComponent] = _lwd(8),
+                 in_clock: ElectricComponent = _lwd()):
         self.dtfs = [LevelTrigDTFlipFlop(
             d, self.in_clock) for d in self.in_data]
         self.out_q = [dtf.out_q for dtf in self.dtfs]

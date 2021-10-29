@@ -5,8 +5,8 @@ from corecomponents import LooseWire, OR, AND, NAND, NOR
 
 class IntegratedLogicGate(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
-    outputs = ElectricComponent.unpack_io('out_main')
+    # inputs = ElectricComponent.unpack_io('in_a', 'in_b')
+    # outputs = ElectricComponent.unpack_io('out_main')
 
     def get_state(self):
         return self.out_main.get_state()

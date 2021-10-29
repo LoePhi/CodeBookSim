@@ -7,8 +7,8 @@ from misccomp import OnesComplement
 
 class HalfAdder(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
-    outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
+    # inputs = ElectricComponent.unpack_io('in_a', 'in_b')
+    # outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
 
     def __init__(self, in_a: ElectricComponent = None,
                  in_b: ElectricComponent = None):
@@ -23,8 +23,8 @@ class HalfAdder(IntegratedComponent):
 
 class FullAdder(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b', 'in_carry')
-    outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
+    # inputs = ElectricComponent.unpack_io('in_a', 'in_b', 'in_carry')
+    # outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
 
     def __init__(self, in_a: ElectricComponent = None,
                  in_b: ElectricComponent = None,
@@ -43,8 +43,8 @@ class FullAdder(IntegratedComponent):
 
 class Eight_Bit_Adder(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_carry')
-    outputs = ElectricComponent.unpack_io('out_sum:8', 'out_carry')
+    # inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_carry')
+    # outputs = ElectricComponent.unpack_io('out_sum:8', 'out_carry')
 
     def __init__(self,
                  in_a: list = None,
@@ -72,8 +72,8 @@ class Eight_Bit_Adder(IntegratedComponent):
 
 class Sixteen_Bit_Adder(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_a:16', 'in_b:16', 'in_carry')
-    outputs = ElectricComponent.unpack_io('out_sum:16', 'out_carry')
+    # inputs = ElectricComponent.unpack_io('in_a:16', 'in_b:16', 'in_carry')
+    # outputs = ElectricComponent.unpack_io('out_sum:16', 'out_carry')
 
     def __init__(self,
                  in_a: list = None,
@@ -99,8 +99,8 @@ class Sixteen_Bit_Adder(IntegratedComponent):
 
 class AddMin(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_sub')
-    outputs = ElectricComponent.unpack_io('out_sum:8', 'out_flow')
+    # inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_sub')
+    # outputs = ElectricComponent.unpack_io('out_sum:8', 'out_flow')
 
     def __init__(self,
                  in_a: list = None,

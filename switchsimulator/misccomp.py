@@ -4,11 +4,10 @@ from corecomponents import LooseWire, AND, OR, INV
 from logicgates import XOR
 
 
-# TODO: bessere namen für in-, outputs; v.a. _output ersetzen
 class OnesComplement(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_in:8', 'in_invert')
-    outputs = ElectricComponent.unpack_io('out_main:8')
+    # inputs = ElectricComponent.unpack_io('in_in:8', 'in_invert')
+    # outputs = ElectricComponent.unpack_io('out_main:8')
 
     def __init__(self,
                  in_in: ElectricComponent = None,
@@ -25,8 +24,8 @@ class OnesComplement(IntegratedComponent):
 
 class Selector_2_1(IntegratedComponent):
 
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b', 'in_select')
-    outputs = ElectricComponent.unpack_io('out_main')
+    # inputs = ElectricComponent.unpack_io('in_a', 'in_b', 'in_select')
+    # outputs = ElectricComponent.unpack_io('out_main')
 
     def __init__(self, in_a: ElectricComponent = None,
                  in_b: ElectricComponent = None,

@@ -6,21 +6,6 @@ class ElectricComponent(ABC):
     Parent class for all components of the electric circuit
     """
 
-    # Each class should have a tuple specifying available inputs and outputs
-    # The output tuple is looped over to check if the output changes
-    @staticmethod
-    def unpack_io(*io_str):
-        io_dict = {}
-        for i in range(len(io_str)):
-            x = io_str[i].split(":")
-            io_dict[x[0]] = {'N': int(x[1]) if len(x) > 1 else 1}
-        return io_dict
-    # TODO: turn these into abstract properties:
-    # https://stackoverflow.com/questions/2736255/abstract-attributes-in-python
-    # -> vielleicht kann man dabei auch das entpacken mit einbauen
-    # inputs = unpack_io()
-    # outputs = unpack_io()
-
     def connect_input(self, input_name: str,
                       input_circuit: 'ElectricComponent'):
         """

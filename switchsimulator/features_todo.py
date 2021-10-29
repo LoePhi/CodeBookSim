@@ -42,6 +42,8 @@ hihi(2, b=3)
 # -> bsp. 8bitadder: bisher löst jede änderung eines bits eine Kaskade für sich aus
 # durch queue könnten alle gemeinsam erfolgen
 # !Auf Reihenfolge der bits achten! lsb zuerst
+# Achtung, könnte dazu führen dass iene Änderung die anderen überholt
+# -> neue Queue für jeden Clock-Tick
 
 # TODO: helpers -> überlegen wie weit ich hier abstrahieren möchte (zb selebr zwischen systemen kovertieren)
 # -> dann gute namen finden, richtig funktionen auswählen und tests schreiben

@@ -11,7 +11,7 @@ class CoreComponent(ElectricComponent):
     called 'out_main'
     """
 
-    outputs = ElectricComponent.unpack_io('out_main', )
+    # outputs = ElectricComponent.unpack_io('out_main', )
 
     def setup(self):
         self.forward_connections = []
@@ -96,7 +96,7 @@ class LooseWire(CoreComponent):
 class INV(CoreComponent):
     """Inverts the input"""
 
-    inputs = ElectricComponent.unpack_io('in_a', )
+    # inputs = ElectricComponent.unpack_io('in_a', )
 
     def __init__(self, in_a: ElectricComponent = None):
         self.in_a = in_a if in_a is not None else LooseWire()
@@ -112,7 +112,7 @@ class INV(CoreComponent):
 
 class BaseGate(CoreComponent):
 
-    inputs = ElectricComponent.unpack_io('in_a', 'in_b')
+    # inputs = ElectricComponent.unpack_io('in_a', 'in_b')
 
     def __init__(self, in_a: ElectricComponent = None,
                  in_b: ElectricComponent = None):
