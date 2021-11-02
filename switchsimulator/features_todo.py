@@ -48,9 +48,13 @@ hihi(2, b=3)
 # TODO: helpers -> überlegen wie weit ich hier abstrahieren möchte (zb selebr zwischen systemen kovertieren)
 # -> dann gute namen finden, richtig funktionen auswählen und tests schreiben
 
+# TODO: tuples statt list?
+
+# TODO: read, understand https://codereview.stackexchange.com/questions/269579/decorating-init-for-automatic-attribute-assignment-safe-and-good-practice
 
 # List of not implemented circuits
+# And3, p. 115 
 # Buffer, p. 128
 # oscillator, p. 157
 # Adding machines, p.168, p. 170
-# And3, p. 115 
+# Level-Triggered-8-Bit-Latch with clear, p. 170

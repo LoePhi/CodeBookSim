@@ -1,76 +1,93 @@
-from integratedcomponent import IntegratedComponent
+from integratedcomponent import IntegratedComponent, SingleStateIC
 from electriccomponent import ElectricComponent
-from corecomponents import INV, CoreComponent, LooseWire
+from corecomponents import INV, CoreComponent, AND, Switch
 from memory import EdgeTrigDTFlipFlop
 import time
+from helpers import autoparse, _lwd
 
 
-class Buffer(CoreComponent):
-    """Buffer"""
+class oscillator(SingleStateIC):
 
-    # inputs = ElectricComponent.unpack_io('in_a', )
+    @autoparse
+    def __init__(self,
+                 in_control: ElectricComponent = _lwd()):
+        self.inv1 = INV()
+        self.and1 = AND(self.inv1, self.in_control)
+        self.inv1.connect_input("in_a", self.and1)
+        self.out_main = self.inv1
 
-    def __init__(self, in_a: ElectricComponent = None, delay: float = .1):
-        self.in_a = in_a if in_a is not None else LooseWire()
-        self.delay = delay
+
+class RippleCounter(IntegratedComponent):
+
+    @autoparse
+    def __init__(self,
+                 in_clock: ElectricComponent = _lwd(),
+                 nbit: int = 8):
+
+        self.inv1 = INV(self.in_clock)
+
+        ff_tmp = EdgeTrigDTFlipFlop(in_clock=self.in_clock)
+        ff_tmp.connect_input('in_data', ff_tmp.out_qb)
+        self.ffs = [ff_tmp]
+        for i in range(1, nbit-1):
+            ff_tmp = EdgeTrigDTFlipFlop(in_clock=self.ffs[-1].out_qb)
+            ff_tmp.connect_input('in_data', ff_tmp.out_qb)
+            self.ffs.append(ff_tmp)
+
+        self.out_main = [ff.out_q for ff in self.ffs[::-1]] + [self.inv1]
+
+
+class clockmonitor(CoreComponent):
+
+    @autoparse
+    def __init__(self,
+                 in_data: ElectricComponent = _lwd(4),
+                 in_clock: ElectricComponent = _lwd()):
         self.setup()
 
     def build_circuit(self):
-        self.in_a.add_connection(self, 'in_a')
+        self.in_clock.add_connection(self, 'in_data')
 
     def compute_state(self):
-        time.sleep(self.delay)
-        self.out_main = self.in_a.is_on
-        print(self.out_main)
-        # self.out_main = not self.in_a.is_on
+        self.out_main = [d.is_on for d in self.in_data]
+        print(''.join([str(int(b)) for b in self.out_main]))
+        time.sleep(0)
 
 
-class Gate(CoreComponent):
-    """Gate"""
-
-    # inputs = ElectricComponent.unpack_io('in_a', )
-
-    def __init__(self, in_a: ElectricComponent = None, delay: float = .1):
-        self.in_a = in_a if in_a is not None else LooseWire()
-        self.delay = delay
-        self.setup()
-
-    def build_circuit(self):
-        self.in_a.add_connection(self, 'in_a')
-
-    def compute_state(self):
-        time.sleep(self.delay)
-        self.out_main = self.in_a.is_on
-        print(self.out_main)
-        # self.out_main = not self.in_a.is_on
-
-
-class oscillator(IntegratedComponent):
-    def __init__(self, in_a: ElectricComponent = None, clockspeed=1):
-        bu1 = Buffer()
-        inv1 = INV(bu1)
-        bu1.connect_input("in_a", inv1)
-        self.out_main = inv1
-
+# sw = Switch(False)
+# cl = oscillator(sw)
+# rc = RippleCounter(cl, 16)
+# mon = clockmonitor(rc.out_main, cl)
+# cl.out_main.forward_connections = cl.out_main.forward_connections[1:] + [
+#     cl.out_main.forward_connections[0]]
 
 # try:
-#     asd = oscillator()
-# except:
-#     RecursionError('HI')
+#     import sys
+#     sys.setrecursionlimit(1000000000)
+#     sw.flip()
+# except RecursionError:
+#     print("war klar")
+
+class osc2(SingleStateIC):
+    def __init__(self, in_control):
+        self.out_main = Switch(False)
+        self.in_control = in_control
+
+    def start(self):
+        while(self.in_control.is_on):
+            print(self.in_control)
+            self.out_main.flip()
+            time.sleep(1)
 
 
-# c1 = Switch(False)
+sw = Switch(False)
+cl = osc2(sw)
+rc = RippleCounter(cl, 16)
+mon = clockmonitor(rc.out_main, cl)
+cl.start()
 
-# l1 = EdgeTriggeredDTFlipFlop(in_clock=c1)
-# l2 = EdgeTriggeredDTFlipFlop(in_clock=l1.out_qb)
-# l3 = EdgeTriggeredDTFlipFlop(in_clock=l2.out_qb)
-# l4 = EdgeTriggeredDTFlipFlop(in_clock=l3.out_qb)
-# l1.connect_input("in_data", l1.out_qb)
-# l2.connect_input("in_data", l2.out_qb)
-# l3.connect_input("in_data", l3.out_qb)
-# l4.connect_input("in_data", l4.out_qb)
-
-# for i in range(10):
-#     c1.flip()
-#     ou = [l.__str__()[0] for l in [INV(c1), l1, l2, l3, l4]][::-1]
-#     print(''.join(ou))
+import threading
+x = threading.Thread(target=cl.start)
+x.start()
+sw.flip()
+sw.flip()

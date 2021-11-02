@@ -2,6 +2,7 @@ from electriccomponent import ElectricComponent
 from integratedcomponent import IntegratedComponent
 from corecomponents import LooseWire, AND, OR, INV
 from logicgates import XOR
+from helpers import autoparse, _lwd
 
 
 class OnesComplement(IntegratedComponent):
@@ -9,12 +10,10 @@ class OnesComplement(IntegratedComponent):
     # inputs = ElectricComponent.unpack_io('in_in:8', 'in_invert')
     # outputs = ElectricComponent.unpack_io('out_main:8')
 
+    @autoparse
     def __init__(self,
-                 in_in: ElectricComponent = None,
-                 in_invert: ElectricComponent = None):
-        self.in_in = in_in if in_in is not None else [
-            LooseWire() for x in range(8)]
-        self.in_invert = in_invert if in_invert is not None else LooseWire()
+                 in_in: list[ElectricComponent] = _lwd(8),
+                 in_invert: ElectricComponent = _lwd()):
         self.out_main = [XOR(inp, self.in_invert) for inp in self.in_in]
 
     def __str__(self):

@@ -1,6 +1,6 @@
 from electriccomponent import ElectricComponent
 from integratedcomponent import IntegratedComponent
-from corecomponents import LooseWire, AND, INV, NOR
+from corecomponents import LooseWire, AND, INV, NOR, OR
 from helpers import _lwd, autoparse
 from logicgates import NOR3
 
@@ -11,8 +11,8 @@ class RSFlipFlop(IntegratedComponent):
     # outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
 
     def __init__(self,
-                 in_r=None,
-                 in_s=None):
+                 in_r: ElectricComponent = None,
+                 in_s: ElectricComponent = None):
         self.in_r = in_r if in_r is not None else LooseWire()
         self.in_s = in_s if in_s is not None else LooseWire()
         self.nor1 = NOR(self.in_r)
@@ -40,6 +40,26 @@ class LevelTrigDTFlipFlop(IntegratedComponent):
         self.and1 = AND(INV(self.in_data), self.in_clock)
         self.and2 = AND(self.in_data, self.in_clock)
         self.rsff1 = RSFlipFlop(self.and1, self.and2)
+        self.out_q = self.rsff1.out_q
+        self.out_qb = self.rsff1.out_qb
+
+    def __str__(self):
+        return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+
+
+class LevelTrigDTFlipFlopCl(IntegratedComponent):
+
+    @autoparse
+    def __init__(self,
+                 in_data: ElectricComponent = _lwd(),
+                 in_clock: ElectricComponent = _lwd(),
+                 in_clear: ElectricComponent = _lwd()):
+        self.in_data = in_data if in_data is not None else LooseWire()
+        self.in_clock = in_clock if in_clock is not None else LooseWire()
+        self.and1 = AND(INV(self.in_data), self.in_clock)
+        self.and2 = AND(self.in_data, self.in_clock)
+        self.or1 = OR(self.in_clear, self.and1)
+        self.rsff1 = RSFlipFlop(self.or1, self.and2)
         self.out_q = self.rsff1.out_q
         self.out_qb = self.rsff1.out_qb
 

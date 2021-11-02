@@ -10,6 +10,8 @@ def test_ones_complement():
     assert(oc1.__str__() == '10101010')
     s1.flip()
     assert(oc1.__str__() == '01010101')
+    s1.flip()
+    assert(oc1.__str__() == '10101010')
 
 
 def test_selector_2_1():

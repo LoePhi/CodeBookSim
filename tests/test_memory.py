@@ -1,8 +1,9 @@
 import pytest
 from switchsimulator.corecomponents import Switch
-from switchsimulator.memory import RSFlipFlop, LevelTrigDTFlipFlop
-from switchsimulator.memory import LevelTrig8BitLatch, EdgeTrigDTFlipFlop
-from switchsimulator.memory import EdgeTrigDTFlipFlopPreCl
+from switchsimulator.memory import RSFlipFlop
+from switchsimulator.memory import LevelTrigDTFlipFlop, LevelTrigDTFlipFlopCl
+from switchsimulator.memory import EdgeTrigDTFlipFlop, EdgeTrigDTFlipFlopPreCl
+from switchsimulator.memory import LevelTrig8BitLatch
 from switchsimulator.helpers import bts
 
 
@@ -42,6 +43,36 @@ def test_lvlt_dt_flipflop():
     assert(ff.__str__() == '01')
 
 
+def test_lvlt_dt_flipflop_cl():
+    d = Switch(False)
+    c = Switch(True)
+    ff = LevelTrigDTFlipFlopCl(d, c)
+    assert(ff.__str__() == '01')
+    c.open()
+    assert(ff.__str__() == '01')
+    d.close()
+    assert(ff.__str__() == '01')
+    c.close()
+    assert(ff.__str__() == '10')
+    c.open()
+    assert(ff.__str__() == '10')
+    d.flip()
+    assert(ff.__str__() == '10')
+    c.close()
+    assert(ff.__str__() == '01')
+    clear = Switch(False)
+    ff.connect_input('in_clear', clear)
+    d.close()
+    assert(ff.__str__() == '10')
+    clear.close()
+    assert(ff.__str__()[0] == '0')
+    clear.open()
+    assert(ff.__str__() == '10')
+    c.open()
+    clear.close()
+    assert(ff.__str__()[0] == '0')
+
+
 def test_edget_dt_flipflop():
     s1 = Switch(True)
     s2 = Switch(False)
@@ -64,7 +95,7 @@ def test_edget_dt_flipflop():
     assert(etdtff2.__str__() == '10')
 
 
-def test_eight_bit_latch():
+def test_lvelt_8_bit_latch():
     clock = Switch(True)
     data = bts('01010101')
     ebl1 = LevelTrig8BitLatch(data, clock)

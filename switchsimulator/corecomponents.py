@@ -4,7 +4,7 @@ from electriccomponent import ElectricComponent
 class CoreComponent(ElectricComponent):
     """
     Parent Class for all core components
-    This are the basic buidling blocks that all
+    These are the basic buidling blocks that all
     other components are assembled from
 
     All core components have a singlaur output-line
@@ -26,7 +26,7 @@ class CoreComponent(ElectricComponent):
     is_on = property(get_state)
 
     def add_connection(self, con, port):
-        """Called by downstream elements to add the as a forward connection"""
+        """Called by downstream elements to add them as a forward connection"""
         if (con, port) not in self.forward_connections:
             self.forward_connections.append((con, port))
         # backward connections can be used for debugging the circuit
@@ -50,19 +50,19 @@ class CoreComponent(ElectricComponent):
 
 class Switch(CoreComponent):
     """
-    Simple Switch
-    It carries a current when it is closed
+    Simple Switch. It is used to control a gate.
+    When the gate is closed it carries a current.
     """
 
     def __init__(self, closed: bool = False):
-        self.closed = closed
+        self.out_main = closed
         self.setup()
 
     def build_circuit(self):
         pass
 
     def compute_state(self):
-        self.out_main = self.closed
+        pass
 
     def flip(self):
         self.out_main = not self.out_main
@@ -106,13 +106,16 @@ class INV(CoreComponent):
         self.in_a.add_connection(self, 'in_a')
 
     def compute_state(self):
-        self.out_main = False if self.in_a.is_on else True
+        self.out_main = True
+        if self.in_a.is_on:
+            self.out_main = False
         # self.out_main = not self.in_a.is_on
 
 
 class BaseGate(CoreComponent):
-
-    # inputs = ElectricComponent.unpack_io('in_a', 'in_b')
+    """
+    Parent for the baisc logic gates
+    """
 
     def __init__(self, in_a: ElectricComponent = None,
                  in_b: ElectricComponent = None):
