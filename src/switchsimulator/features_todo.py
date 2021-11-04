@@ -1,36 +1,5 @@
 # flake8: noqa
 
-# TODO: Input-Handling
-# Im Moment erzeugen die
-# LooseWire()-Defaults nur deshalb eigene Instanzen weil __slots__ in
-# LooseWire gesetzt ist. Das ist von außen aber nicht ersichtlich
-
-# Ich denke die Inits könnten in dieser Weise decoriert werden
-# um die Inputs automatisch umzuwandeln
-# es muss aber arauf geachtet werden, dass es immer noch möglich ist
-# weitere Argumente zu übergeben (wie zb in connector) bzw. muss sichergestellt werden,
-# dass es sich nur um tatsächliche inputs handelt -> input-tuple
-
-
-def my_dec(func):
-    def inner(*args, **kwargs):
-        print('w')
-        rea = [str(x) for x in args]
-        for e in kwargs:
-            kwargs[e] = e + str(kwargs[e])
-        return func(*rea, **kwargs)
-    return inner
-
-
-@my_dec
-def hihi(a=None, b=None):
-    print(a)
-    print(b)
-
-
-hihi(2, b=3)
-
-
 # TODO: __repr__ mit pretty printing
 
 # TODO: Implement __str__ für alle Komponenten
@@ -54,9 +23,21 @@ hihi(2, b=3)
 
 # TODO: remove main_out from multibit components
 
+# TODO: ?nicht alle Zwischenelemente der Instanz zuweisen -> können auch über connections gefunden werden
+# Andererseits kostet das auch nicht wirklich was und macht das inspizieren leichter
+# -> dann aber auch alle zuweisen (nicht self.out_main = AND(...))
+
+# TODO: durchgehen und überall type hints setzen (mypy --strict)
+
+# TODO: variable sized version von adder, latch, OnesComplement, ..?
+
 # List of not implemented circuits
 # And3, p. 115 
 # Buffer, p. 128
 # oscillator, p. 157
-# Adding machines, p.168, p. 170
+# Adding machines, p.168
 # Level-Triggered-8-Bit-Latch with clear, p. 170
+
+# List of modified circuits
+# Adding machine p. 170 - EdgeTriggered FF instead of Level-Triggered
+# 8-Bit Ripple Counter - Generalized to any numer of bits

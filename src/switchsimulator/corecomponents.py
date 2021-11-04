@@ -108,7 +108,7 @@ class _LooseWireSentinel(ElectricComponent):
         pass
 
 
-def set_sent(n: Optional[int] = None):
+def no_con(n: Optional[int] = None):
     """
     ONLY for use with the @autoparse decorator.
     LooseWires are temporary and will be exchanged by the decorator.
@@ -162,7 +162,7 @@ class INV(CoreComponent):
 
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = set_sent()):
+                 in_a: ElectricComponent = no_con()):
         self.in_a = in_a
         self.setup()
 
@@ -182,8 +182,8 @@ class BaseGate(CoreComponent):
 
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = set_sent(),
-                 in_b: ElectricComponent = set_sent()):
+                 in_a: ElectricComponent = no_con(),
+                 in_b: ElectricComponent = no_con()):
         self.in_a = in_a
         self.in_b = in_b
         self.setup()

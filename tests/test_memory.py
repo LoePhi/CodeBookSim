@@ -1,6 +1,6 @@
 import pytest
 from switchsimulator.corecomponents import Switch
-from switchsimulator.memory import RSFlipFlop
+from switchsimulator.memory import EdgeTrig8BitLatchPreCl, RSFlipFlop
 from switchsimulator.memory import LevelTrigDTFlipFlop, LevelTrigDTFlipFlopCl
 from switchsimulator.memory import EdgeTrigDTFlipFlop, EdgeTrigDTFlipFlopPreCl
 from switchsimulator.memory import LevelTrig8BitLatch
@@ -95,21 +95,6 @@ def test_edget_dt_flipflop():
     assert(etdtff2.__str__() == '10')
 
 
-def test_lvelt_8_bit_latch():
-    clock = Switch(True)
-    data = bts('01010101')
-    ebl1 = LevelTrig8BitLatch(data, clock)
-    assert(ebl1.__str__() == '01010101')
-    clock.flip()
-    assert(ebl1.__str__() == '01010101')
-    data[0].flip()
-    assert(ebl1.__str__() == '01010101')
-    ebl2 = LevelTrig8BitLatch(data, clock)
-    clock.flip()
-    assert(ebl1.__str__() == '11010101')
-    assert(ebl2.__str__() == '11010101')
-
-
 def test_edget_dt_flipflop_precl():
     s1 = Switch(True)
     s2 = Switch(False)
@@ -173,3 +158,45 @@ def test_edget_dt_flipflop_precl():
     c1.flip()  # ->on
     assert(etdtff1.__str__() == '01')
     assert(etdtff2.__str__() == '01')
+
+
+def test_lvlt_8_bit_latch():
+    clock = Switch(True)
+    data = bts('01010101')
+    ebl1 = LevelTrig8BitLatch(data, clock)
+    assert(ebl1.__str__() == '01010101')
+    clock.flip()
+    assert(ebl1.__str__() == '01010101')
+    data[0].flip()
+    assert(ebl1.__str__() == '01010101')
+    ebl2 = LevelTrig8BitLatch(data, clock)
+    clock.flip()
+    assert(ebl1.__str__() == '11010101')
+    assert(ebl2.__str__() == '11010101')
+
+
+def test_edget_8_bit_latch_precl():
+    clock = Switch(False)
+    preset = Switch(False)
+    clear = Switch(False)
+
+    data = bts('01010101')
+    ebl1 = EdgeTrig8BitLatchPreCl(data, clock, preset, clear)
+    clock.close()
+    assert(ebl1.__str__() == '01010101')
+    clock.open()
+    assert(ebl1.__str__() == '01010101')
+    data[0].flip()
+    assert(ebl1.__str__() == '01010101')
+    clock.close()
+    assert(ebl1.__str__() == '11010101')
+    preset.flip()
+    assert(ebl1.__str__() == '11111111')
+    clock.open()
+    assert(ebl1.__str__() == '11111111')
+    clock.close()
+    preset.flip()
+    clear.flip()
+    assert(ebl1.__str__() == '00000000')
+    clock.open()
+    assert(ebl1.__str__() == '00000000')

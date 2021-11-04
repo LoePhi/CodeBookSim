@@ -1,7 +1,7 @@
 from switchsimulator.electriccomponent import ElectricComponent
 from switchsimulator.secondarycomponents import SingleStateSC
 from switchsimulator.corecomponents import OR, AND, NAND, NOR
-from switchsimulator.corecomponents import autoparse, set_sent
+from switchsimulator.corecomponents import autoparse, no_con
 
 
 class XOR(SingleStateSC):
@@ -9,8 +9,8 @@ class XOR(SingleStateSC):
 
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = set_sent(),
-                 in_b: ElectricComponent = set_sent()):
+                 in_a: ElectricComponent = no_con(),
+                 in_b: ElectricComponent = no_con()):
         self.in_a = in_a
         self.in_b = in_b
 
@@ -24,9 +24,9 @@ class NOR3(SingleStateSC):
 
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = set_sent(),
-                 in_b: ElectricComponent = set_sent(),
-                 in_c: ElectricComponent = set_sent()):
+                 in_a: ElectricComponent = no_con(),
+                 in_b: ElectricComponent = no_con(),
+                 in_c: ElectricComponent = no_con()):
         self.in_a = in_a
         self.in_b = in_b
         self.in_c = in_c

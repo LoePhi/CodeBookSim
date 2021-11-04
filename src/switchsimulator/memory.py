@@ -1,6 +1,6 @@
 from switchsimulator.electriccomponent import ElectricComponent
 from .secondarycomponents import SecondaryComponent
-from .corecomponents import AND, INV, NOR, OR, autoparse, set_sent
+from .corecomponents import AND, INV, NOR, OR, autoparse, no_con
 from .logicgates import NOR3
 
 
@@ -11,8 +11,8 @@ class RSFlipFlop(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_r: ElectricComponent = set_sent(),
-                 in_s: ElectricComponent = set_sent()):
+                 in_r: ElectricComponent = no_con(),
+                 in_s: ElectricComponent = no_con()):
         self.in_r = in_r
         self.in_s = in_s
 
@@ -36,8 +36,8 @@ class LevelTrigDTFlipFlop(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_data: ElectricComponent = set_sent(),
-                 in_clock: ElectricComponent = set_sent()):
+                 in_data: ElectricComponent = no_con(),
+                 in_clock: ElectricComponent = no_con()):
         self.in_data = in_data
         self.in_clock = in_clock
 
@@ -56,9 +56,9 @@ class LevelTrigDTFlipFlopCl(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_data: ElectricComponent = set_sent(),
-                 in_clock: ElectricComponent = set_sent(),
-                 in_clear: ElectricComponent = set_sent()):
+                 in_data: ElectricComponent = no_con(),
+                 in_clock: ElectricComponent = no_con(),
+                 in_clear: ElectricComponent = no_con()):
         self.in_data = in_data
         self.in_clock = in_clock
         self.in_clear = in_clear
@@ -82,8 +82,8 @@ class EdgeTrigDTFlipFlop(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_data: ElectricComponent = set_sent(),
-                 in_clock: ElectricComponent = set_sent()):
+                 in_data: ElectricComponent = no_con(),
+                 in_clock: ElectricComponent = no_con()):
         self.in_data = in_data
         self.in_clock = in_clock
 
@@ -102,10 +102,10 @@ class EdgeTrigDTFlipFlopPreCl(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_data: ElectricComponent = set_sent(),
-                 in_clock: ElectricComponent = set_sent(),
-                 in_preset: ElectricComponent = set_sent(),
-                 in_clear: ElectricComponent = set_sent()):
+                 in_data: ElectricComponent = no_con(),
+                 in_clock: ElectricComponent = no_con(),
+                 in_preset: ElectricComponent = no_con(),
+                 in_clear: ElectricComponent = no_con()):
 
         self.in_data = in_data
         self.in_clock = in_clock
@@ -140,16 +140,43 @@ class LevelTrig8BitLatch(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_data: list[ElectricComponent] = set_sent(8),
-                 in_clock: ElectricComponent = set_sent()):
+                 in_data: list[ElectricComponent] = no_con(8),
+                 in_clock: ElectricComponent = no_con()):
 
         self.in_data = in_data
         self.in_clock = in_clock
 
-        self.dtfs = [LevelTrigDTFlipFlop(
+        self.dtff = [LevelTrigDTFlipFlop(
             d, self.in_clock) for d in self.in_data]
 
-        self.out_q = [dtf.out_q for dtf in self.dtfs]
+        self.out_q = [dtf.out_q for dtf in self.dtff]
+
+    def __str__(self):
+        return ''.join([str(int(q.is_on)) for q in self.out_q])
+
+
+class EdgeTrig8BitLatchPreCl(SecondaryComponent):
+
+    # inputs = ElectricComponent.unpack_io('in_data:8', 'in_clock')
+    # outputs = ElectricComponent.unpack_io('out_q', 'out_qb')
+
+    @autoparse
+    def __init__(self,
+                 in_data: list[ElectricComponent] = no_con(8),
+                 in_clock: ElectricComponent = no_con(),
+                 in_preset: ElectricComponent = no_con(),
+                 in_clear: ElectricComponent = no_con()):
+
+        self.in_data = in_data
+        self.in_clock = in_clock
+        self.in_preset = in_preset
+        self.in_clear = in_clear
+
+        self.etff = [EdgeTrigDTFlipFlopPreCl(
+            d, self.in_clock, self.in_preset, self.in_clear)
+            for d in self.in_data]
+
+        self.out_q = [dtf.out_q for dtf in self.etff]
 
     def __str__(self):
         return ''.join([str(int(q.is_on)) for q in self.out_q])

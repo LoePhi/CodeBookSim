@@ -5,7 +5,7 @@ from switchsimulator.electriccomponent import ElectricComponent
 from switchsimulator.corecomponents import INV, CoreComponent, Switch
 from switchsimulator.memory import EdgeTrigDTFlipFlop
 import time
-from switchsimulator.corecomponents import autoparse, set_sent
+from switchsimulator.corecomponents import autoparse, no_con
 
 
 class book_oscillator(SingleStateSC):
@@ -32,7 +32,7 @@ class clock(SingleStateSC):
     """
 
     def __init__(self,
-                 in_control: ElectricComponent = set_sent(),
+                 in_control: ElectricComponent = no_con(),
                  delay: float = 0,
                  print_hz: bool = False):
         self.in_control = in_control
@@ -60,10 +60,14 @@ class clock(SingleStateSC):
 
 
 class RippleCounter(SecondaryComponent):
+    """
+    Ripple-Counter, p. 177
+    ! This one can be changed to any bitsize
+    """
 
     @autoparse
     def __init__(self,
-                 in_clock: ElectricComponent = set_sent(),
+                 in_clock: ElectricComponent = no_con(),
                  nbit: int = 8):
         self.in_clock = in_clock
 
@@ -85,7 +89,7 @@ class monitor(CoreComponent):
     @autoparse
     def __init__(self,
                  in_data: ElectricComponent,
-                 in_clock: ElectricComponent = set_sent()):
+                 in_clock: ElectricComponent = no_con()):
         self.in_data = in_data
         self.in_clock = in_clock
 

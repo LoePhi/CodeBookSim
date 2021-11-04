@@ -1,6 +1,6 @@
 from switchsimulator.electriccomponent import ElectricComponent
 from switchsimulator.secondarycomponents import SecondaryComponent
-from switchsimulator.corecomponents import AND, OR, INV, set_sent, autoparse
+from switchsimulator.corecomponents import AND, OR, INV, no_con, autoparse
 from switchsimulator.logicgates import XOR
 from typing import List
 
@@ -12,8 +12,8 @@ class OnesComplement(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_in: List[ElectricComponent] = set_sent(8),
-                 in_invert: ElectricComponent = set_sent()):
+                 in_in: List[ElectricComponent] = no_con(8),
+                 in_invert: ElectricComponent = no_con()):
         self.in_in = in_in
         self.in_invert = in_invert
 
@@ -31,9 +31,9 @@ class Selector_2_1(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = set_sent(),
-                 in_b: ElectricComponent = set_sent(),
-                 in_select: ElectricComponent = set_sent()):
+                 in_a: ElectricComponent = no_con(),
+                 in_b: ElectricComponent = no_con(),
+                 in_select: ElectricComponent = no_con()):
         self.in_a = in_a
         self.in_b = in_b
         self.in_select = in_select
