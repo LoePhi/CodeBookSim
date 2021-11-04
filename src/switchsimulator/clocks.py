@@ -6,6 +6,7 @@ from switchsimulator.corecomponents import INV, CoreComponent, Switch
 from switchsimulator.memory import EdgeTrigDTFlipFlop
 import time
 from switchsimulator.corecomponents import autoparse, no_con
+from typing import List
 
 
 class book_oscillator(SingleStateSC):
@@ -47,7 +48,7 @@ class clock(SingleStateSC):
             timestmp = time.time()
             kcycl = 100
         while(self.in_control.is_on):
-            # time.sleep(self.delay)
+            time.sleep(self.delay)
             self.out_main.flip()
             if self.print_hz:
                 counter = counter + 1
@@ -84,29 +85,44 @@ class RippleCounter(SecondaryComponent):
         self.out_main = [ff.out_q for ff in self.ffs[::-1]] + [self.inv1]
 
 
-class monitor(CoreComponent):
+class monitor(ElectricComponent):
+    """
+    not really core because out_main has more than 1 bit
+    """
 
     @autoparse
     def __init__(self,
-                 in_data: ElectricComponent,
-                 in_clock: ElectricComponent = no_con()):
+                 in_data: List[ElectricComponent],
+                 in_clock: ElectricComponent = no_con(),
+                 mode: str = 'clock'):
         self.in_data = in_data
         self.in_clock = in_clock
+        self.mode = mode
 
-        self.setup()
+        self.backward_connections = []  # not used
+        self.build_circuit()
 
     def build_circuit(self):
-        self.in_clock.add_connection(self, 'in_data')
+        if self.mode == 'update':
+            for d in self.in_data:
+                d.add_connection(self, 'in_data')
+        if self.mode == 'clock':
+            self.in_clock.add_connection(self, 'in_clock')
+        self.bulbs = [False for _ in self.in_data]
+
+    def update(self):
+        self.compute_state()
+        print('                   ', end='\r')
+        print(''.join([str(int(b)) for b in self.bulbs]), end='\r')  # , end='\r'
 
     def compute_state(self):
-        self.out_main = [d.is_on for d in self.in_data]
-        print(''.join([str(int(b)) for b in self.out_main]))
+        self.bulbs = [d.is_on for d in self.in_data]
 
 
 sw = Switch(False)
-cl = clock(sw, print_hz=True)
+cl = clock(sw, delay=.1, print_hz=False)
 rc = RippleCounter(cl, 16)
-# mon = monitor(rc.out_main, cl)
+mon = monitor(rc.out_main, cl)
 
 sw.flip()
 x = threading.Thread(target=cl.start)
