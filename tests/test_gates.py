@@ -160,3 +160,6 @@ def test_nor3():
     assert(nor3.is_on)
     assert(not nor4.is_on)
     assert(not nor5.is_on)
+    nor6 = NOR3(s1, in_c=s3)
+    nor6.connect_input('in_b', s2)
+    assert(nor6.is_on)

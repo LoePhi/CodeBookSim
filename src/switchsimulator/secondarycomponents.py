@@ -1,12 +1,12 @@
-from electriccomponent import ElectricComponent
+from switchsimulator.electriccomponent import ElectricComponent
 
 
-class IntegratedComponent(ElectricComponent):
+class SecondaryComponent(ElectricComponent):
 
     pass
 
 
-class SingleStateIC(IntegratedComponent):
+class SingleStateSC(SecondaryComponent):
     """
     This allows for its children to be used
     like basegates and other core components
@@ -21,6 +21,8 @@ class SingleStateIC(IntegratedComponent):
     can be written as if XOR were a CoreComponent
     and1.connect_input('in_b', xor1)
     """
+
+    out_main: ElectricComponent
 
     def get_state(self):
         return self.out_main.get_state()

@@ -1,34 +1,45 @@
-from abc import ABC
+from typing import Union, List
 
 
-class ElectricComponent(ABC):
+class ElectricComponent():
     """
     Parent class for all components of the electric circuit
     """
 
-    def connect_input(self, input_name: str,
-                      input_circuit: 'ElectricComponent'):
+    def __init__(self) -> None:
+        raise NotImplementedError
+
+    def add_connection(self, con, port):
+        raise NotImplementedError
+
+    def get_state(self):
+        raise NotImplementedError
+
+    def connect_input(self,
+                      port: str,
+                      component: Union['ElectricComponent',
+                                       List['ElectricComponent']]):
         """
         Should be used if not all inputs were available at initialization
         """
 
-        old_input = getattr(self, input_name)
-        islist = isinstance(old_input, list)
+        old_input = getattr(self, port)
 
-        if not islist:
-            old_input = [old_input]
-            input_circuit = [input_circuit]
+        old_input = old_input if isinstance(old_input, list) else [old_input]
+        component = component if isinstance(component, list) else [component]
 
-        for i in range(len(input_circuit)):
+        if len(old_input) != len(component):
+            raise ValueError("New input has wrong size")
+
+        for i in range(len(component)):
             for fc in old_input[i].forward_connections:
-                setattr(fc[0], fc[1], input_circuit[i])
-                input_circuit[i].add_connection(fc[0], fc[1])
+                setattr(fc[0], fc[1], component[i])
+                component[i].add_connection(fc[0], fc[1])
                 fc[0].update()
 
         # Not functional, just for tracking
-        if not islist:
-            input_circuit = input_circuit[0]
-        setattr(self, input_name, input_circuit)
+        component = component[0] if len(component) == 1 else component
+        setattr(self, port, component)
 
     # def __repr__(self):
 

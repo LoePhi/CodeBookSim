@@ -1,4 +1,7 @@
-from electriccomponent import ElectricComponent
+from typing import Optional
+from switchsimulator.electriccomponent import ElectricComponent
+import inspect
+from functools import wraps
 
 
 class CoreComponent(ElectricComponent):
@@ -12,6 +15,12 @@ class CoreComponent(ElectricComponent):
     """
 
     # outputs = ElectricComponent.unpack_io('out_main', )
+
+    def compute_state(self):
+        raise NotImplementedError
+
+    def build_circuit(self):
+        raise NotImplementedError
 
     def setup(self):
         self.forward_connections = []
@@ -93,13 +102,68 @@ class LooseWire(CoreComponent):
         self.out_main = False
 
 
+class _LooseWireSentinel(ElectricComponent):
+
+    def __init__(self) -> None:
+        pass
+
+
+def set_sent(n: Optional[int] = None):
+    """
+    ONLY for use with the @autoparse decorator.
+    LooseWires are temporary and will be exchanged by the decorator.
+    """
+    if n is None:
+        return _LooseWireSentinel()
+    else:
+        return [_LooseWireSentinel() for _ in range(n)]
+
+
+def exchange_sentinel(x):
+    if isinstance(x, list):
+        return [exchange_sentinel(e) for e in x]
+    elif isinstance(x, tuple):
+        return tuple(exchange_sentinel(e) for e in x)
+    elif isinstance(x, _LooseWireSentinel):
+        return LooseWire()
+    else:
+        return x
+
+
+def autoparse(init):
+    inispec = inspect.getfullargspec(init)
+    parnames = inispec.args[1:]
+    defaults = inispec.defaults
+
+    @wraps(init)
+    def wrapped_init(self, *args, **kwargs):
+        # Turn args into kwargs
+        kwargs.update(zip(parnames[:len(args)], args))
+
+        # apply default parameter values
+        default_start = len(parnames) - len(defaults)
+        for i in range(len(defaults)):
+            if parnames[default_start + i] not in kwargs:
+                kwargs[parnames[default_start + i]] = defaults[i]
+
+        # exchange Sentinels for LooseWires
+        for kw in kwargs:
+            kwargs[kw] = exchange_sentinel(kwargs[kw])
+
+        init(self, **kwargs)
+
+    return wrapped_init
+
+
 class INV(CoreComponent):
     """Inverts the input"""
 
     # inputs = ElectricComponent.unpack_io('in_a', )
 
-    def __init__(self, in_a: ElectricComponent = None):
-        self.in_a = in_a if in_a is not None else LooseWire()
+    @autoparse
+    def __init__(self,
+                 in_a: ElectricComponent = set_sent()):
+        self.in_a = in_a
         self.setup()
 
     def build_circuit(self):
@@ -109,7 +173,6 @@ class INV(CoreComponent):
         self.out_main = True
         if self.in_a.is_on:
             self.out_main = False
-        # self.out_main = not self.in_a.is_on
 
 
 class BaseGate(CoreComponent):
@@ -117,10 +180,12 @@ class BaseGate(CoreComponent):
     Parent for the baisc logic gates
     """
 
-    def __init__(self, in_a: ElectricComponent = None,
-                 in_b: ElectricComponent = None):
-        self.in_a = in_a if in_a is not None else LooseWire()
-        self.in_b = in_b if in_b is not None else LooseWire()
+    @autoparse
+    def __init__(self,
+                 in_a: ElectricComponent = set_sent(),
+                 in_b: ElectricComponent = set_sent()):
+        self.in_a = in_a
+        self.in_b = in_b
         self.setup()
 
     def build_circuit(self):
@@ -136,7 +201,6 @@ class AND(BaseGate):
         if self.in_a.is_on:
             if self.in_b.is_on:
                 self.out_main = True
-        # self.out_main = self.in_a.is_on and self.in_b.is_on
 
 
 class OR(BaseGate):
@@ -148,7 +212,6 @@ class OR(BaseGate):
             self.out_main = True
         if self.in_b.is_on:
             self.out_main = True
-#        self.out_main = self.in_a.is_on or self.in_b.is_on
 
 
 class NOR(BaseGate):

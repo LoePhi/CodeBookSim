@@ -52,6 +52,8 @@ hihi(2, b=3)
 
 # TODO: read, understand https://codereview.stackexchange.com/questions/269579/decorating-init-for-automatic-attribute-assignment-safe-and-good-practice
 
+# TODO: remove main_out from multibit components
+
 # List of not implemented circuits
 # And3, p. 115 
 # Buffer, p. 128
