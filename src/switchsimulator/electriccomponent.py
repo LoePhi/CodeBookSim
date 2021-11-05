@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Any, Iterable, Union, List
 
 
 class ElectricComponent():
@@ -9,16 +9,21 @@ class ElectricComponent():
     def __init__(self) -> None:
         raise NotImplementedError
 
-    def add_connection(self, con, port):
+    # type cheat
+    # add_connection ist hier nur, weil
+    # connect_input sich sonst beschwert
+    # -> connect_input in kinder packen, aber die
+    # gleich bleibenden elemente wieder hier hoch verlagern
+    def add_connection(self, con: 'ElectricComponent', port: str) -> None:
         raise NotImplementedError
 
-    def get_state(self):
+    def get_state(self) -> bool:
         raise NotImplementedError
 
     def connect_input(self,
                       port: str,
                       component: Union['ElectricComponent',
-                                       List['ElectricComponent']]):
+                                       List['ElectricComponent']]) -> None:
         """
         Should be used if not all inputs were available at initialization
         """
@@ -42,7 +47,7 @@ class ElectricComponent():
         setattr(self, port, component)
 
     @staticmethod
-    def _prt_dict_atom(a):
+    def _prt_dict_atom(a: Any) -> str:
         if isinstance(a, ElectricComponent):
             retstr = a.__class__.__name__ + ' at ' + hex(id(a))
         else:
@@ -50,14 +55,14 @@ class ElectricComponent():
         return retstr
 
     @staticmethod
-    def _prt_collection(c):
+    def _prt_collection(c: Iterable[Any]) -> str:
         str_list = []
         for a in c:
             str_list.append(ElectricComponent._prt_dict_elem(a))
         return ', '.join(str_list)
 
     @staticmethod
-    def _prt_dict_elem(e):
+    def _prt_dict_elem(e: Any) -> str:
         if isinstance(e, list):
             retstr = "[" + ElectricComponent._prt_collection(e) + "]"
         elif isinstance(e, tuple):
@@ -66,7 +71,7 @@ class ElectricComponent():
             retstr = ElectricComponent._prt_dict_atom(e)
         return retstr
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Mea culpa
         """

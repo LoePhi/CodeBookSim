@@ -88,23 +88,28 @@ def test_Sixteen_Bit_Adder():
 
 def test_Adder():
     # 8bit
-    eba4 = Adder(bts('10000001'))
-    assert(eba4.__str__() == '0_10000001')
+    eba4 = Adder(bts('10000001'), bts('00001100'))
+    assert(eba4.__str__() == '0_10001101')
     b0 = Switch(True)
     eba4.connect_input("in_carry", b0)
-    assert(eba4.__str__() == '0_10000010')
-    eba4.connect_input("in_b", bts('10001100'))
-    assert(eba4.__str__() == '1_00001110')
+    assert(eba4.__str__() == '0_10001110')
     b0.flip()
-    assert(eba4.__str__() == '1_00001101')
+    assert(eba4.__str__() == '0_10001101')
 
     # 16 bit
     s1 = Switch(True)
     sba1 = Adder(bts('1000000000000001'),
-                 bts('1000000000000001'), s1, nbit=16)
+                 bts('1000000000000001'), s1)
     assert(sba1.__str__() == '1_0000000000000011')
     s1.flip()
     assert(sba1.__str__() == '1_0000000000000010')
+
+    try:
+        s1 = Switch(True)
+        sba1 = Adder(bts('101'), bts('1'))
+        assert False
+    except ValueError:
+        assert True
 
 
 def test_AddMin():

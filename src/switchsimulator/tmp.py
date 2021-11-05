@@ -1,10 +1,13 @@
-from switchsimulator.corecomponents import Switch, AND, OR
-s1 = Switch(True)
-a1 = AND(s1)
-o1 = OR(s1)
-o2 = OR(a1, o1)
-print(s1.__repr__())
-print()
-print(a1.__repr__())
-print()
-print(o2.__repr__())
+class parent:
+
+    def __init__(self, a:int) -> None:
+        self.a = a
+
+    def add_kid(self, kid: 'child') -> None:
+        self.kid = kid
+
+
+class child(parent):
+
+    def __init__(self, a:int) -> None:
+        self.a = a

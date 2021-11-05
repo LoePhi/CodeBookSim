@@ -1,4 +1,5 @@
 from switchsimulator.electriccomponent import ElectricComponent
+from switchsimulator.corecomponents import CoreComponent
 
 
 class SecondaryComponent(ElectricComponent):
@@ -22,7 +23,7 @@ class SingleStateSC(SecondaryComponent):
     and1.connect_input('in_b', xor1)
     """
 
-    out_main: ElectricComponent
+    out_main: CoreComponent
 
     def get_state(self):
         return self.out_main.get_state()

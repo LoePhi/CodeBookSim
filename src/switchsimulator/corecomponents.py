@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Callable, List, Optional, Tuple
 from switchsimulator.electriccomponent import ElectricComponent
 import inspect
 from functools import wraps
@@ -14,42 +14,42 @@ class CoreComponent(ElectricComponent):
     called 'out_main'
     """
 
-    # outputs = ElectricComponent.unpack_io('out_main', )
+    out_main: bool
 
-    def compute_state(self):
+    def compute_state(self) -> None:
         raise NotImplementedError
 
-    def build_circuit(self):
+    def build_circuit(self) -> None:
         raise NotImplementedError
 
-    def setup(self):
-        self.forward_connections = []
+    def setup(self) -> None:
+        self.forward_connections: List[Tuple[CoreComponent, str]] = []
         self.build_circuit()
         self.compute_state()
 
-    def get_state(self):
+    def get_state(self) -> bool:
         """Returns the current state of the output"""
         return self.out_main
 
     is_on = property(get_state)
 
-    def add_connection(self, con, port):
+    def add_connection(self, con: 'CoreComponent', port: str) -> None:
         """Called by downstream elements to add them as a forward connection"""
         if (con, port) not in self.forward_connections:
             self.forward_connections.append((con, port))
 
-    def forward_pass(self):
+    def forward_pass(self) -> None:
         for fc in self.forward_connections:
             fc[0].update()
 
     # TODO: ?keep state
-    def update(self):
+    def update(self) -> None:
         old_state = self.out_main
         self.compute_state()
         if self.out_main != old_state:
             self.forward_pass()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(int(self.out_main))
 
 
@@ -59,25 +59,25 @@ class Switch(CoreComponent):
     When the gate is closed it carries a current.
     """
 
-    def __init__(self, closed: bool = False):
+    def __init__(self, closed: bool = False) -> None:
         self.out_main = closed
         self.setup()
 
-    def build_circuit(self):
+    def build_circuit(self) -> None:
         pass
 
-    def compute_state(self):
+    def compute_state(self) -> None:
         pass
 
-    def flip(self):
+    def flip(self) -> None:
         self.out_main = not self.out_main
         self.forward_pass()
 
-    def open(self):
+    def open(self) -> None:
         self.out_main = False
         self.forward_pass()
 
-    def close(self):
+    def close(self) -> None:
         self.out_main = True
         self.forward_pass()
 
@@ -88,13 +88,13 @@ class LooseWire(CoreComponent):
     It never carries a current
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.setup()
 
-    def build_circuit(self):
+    def build_circuit(self) -> None:
         pass
 
-    def compute_state(self):
+    def compute_state(self) -> None:
         self.out_main = False
 
 
@@ -126,13 +126,13 @@ def exchange_sentinel(x):
         return x
 
 
-def autoparse(init):
+def autoparse(init: Callable) -> Callable:
     inispec = inspect.getfullargspec(init)
     parnames = inispec.args[1:]
     defaults = inispec.defaults
 
     @wraps(init)
-    def wrapped_init(self, *args, **kwargs):
+    def wrapped_init(self, *args, **kwargs) -> None:
         # Turn args into kwargs
         kwargs.update(zip(parnames[:len(args)], args))
 
@@ -156,16 +156,19 @@ class INV(CoreComponent):
 
     # inputs = ElectricComponent.unpack_io('in_a', )
 
+    # TODO: type check darf Core, SingleState
+    # -> module umstrukturienen: baseclasses mit
+    # elctric, core, secondary, singlestate
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = no_con()):
+                 in_a: ElectricComponent = no_con()) -> None:
         self.in_a = in_a
         self.setup()
 
-    def build_circuit(self):
+    def build_circuit(self) -> None:
         self.in_a.add_connection(self, 'in_a')
 
-    def compute_state(self):
+    def compute_state(self) -> None:
         self.out_main = True
         if self.in_a.is_on:
             self.out_main = False
@@ -179,12 +182,12 @@ class BaseGate(CoreComponent):
     @autoparse
     def __init__(self,
                  in_a: ElectricComponent = no_con(),
-                 in_b: ElectricComponent = no_con()):
+                 in_b: ElectricComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_b = in_b
         self.setup()
 
-    def build_circuit(self):
+    def build_circuit(self) -> None:
         self.in_a.add_connection(self, 'in_a')
         self.in_b.add_connection(self, 'in_b')
 
@@ -192,7 +195,7 @@ class BaseGate(CoreComponent):
 class AND(BaseGate):
     """AND-Gate"""
 
-    def compute_state(self):
+    def compute_state(self) -> None:
         self.out_main = False
         if self.in_a.is_on:
             if self.in_b.is_on:
@@ -202,7 +205,7 @@ class AND(BaseGate):
 class OR(BaseGate):
     """OR-Gate"""
 
-    def compute_state(self):
+    def compute_state(self) -> None:
         self.out_main = False
         if self.in_a.is_on:
             self.out_main = True
@@ -213,7 +216,7 @@ class OR(BaseGate):
 class NOR(BaseGate):
     """NOR-Gate"""
 
-    def compute_state(self):
+    def compute_state(self) -> None:
         self.out_main = True
         if self.in_a.is_on:
             self.out_main = False
@@ -224,7 +227,7 @@ class NOR(BaseGate):
 class NAND(BaseGate):
     """NAND-Gate"""
 
-    def compute_state(self):
+    def compute_state(self) -> None:
         self.out_main = True
         if self.in_a.is_on:
             if self.in_b.is_on:

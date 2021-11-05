@@ -1,11 +1,8 @@
 # flake8: noqa
 
-# TODO: __repr__ mit pretty printing
+# TODO: __str__: implement für alle
 
-# TODO: Implement __str__ für alle Komponenten
-
-# TODO: ?Macht es Sinn __eq__ basierend auf __str__ zu bauen?
-# -> Nachlesen was für __eq__ erwartet wird
+# TODO: sollten Tests wirklich aud __str__ basieren?
 
 # TODO: Use queue for updates
 # -> bsp. 8bitadder: bisher löst jede änderung eines bits eine Kaskade für sich aus
@@ -41,3 +38,6 @@
 # List of modified circuits
 # Adding machine p. 170 - EdgeTriggered FF instead of Level-Triggered
 # 8-Bit Ripple Counter - Generalized to any numer of bits
+
+# new components
+# Any-Bit-Adder

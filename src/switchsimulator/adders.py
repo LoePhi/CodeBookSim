@@ -109,26 +109,30 @@ class Sixteen_Bit_Adder(SecondaryComponent):
 
 
 class Adder(SecondaryComponent):
+    """
+    """
 
     @autoparse
     def __init__(self,
-                 in_a: List[ElectricComponent] = no_con(8),
-                 in_b: List[ElectricComponent] = no_con(8),
-                 in_carry: ElectricComponent = no_con(),
-                 nbit: int = 8):
+                 in_a: List[ElectricComponent],
+                 in_b: List[ElectricComponent],
+                 in_carry: ElectricComponent = no_con()):
         self.in_a = in_a
         self.in_b = in_b
         self.in_carry = in_carry
-        self.nbit = nbit
+
+        self.nbit = len(self.in_a)
+        if len(self.in_b) != self.nbit:
+            raise ValueError("Inputs must be of identical length")
 
         self.adders = [FullAdder(
-            self.in_a[nbit-1],
-            self.in_b[nbit-1],
+            self.in_a[self.nbit-1],
+            self.in_b[self.nbit-1],
             self.in_carry)]
-        for i in range(nbit-1):
+        for i in range(self.nbit-1):
             self.adders.append(FullAdder(
-                self.in_a[nbit-2-i],
-                self.in_b[nbit-2-i],
+                self.in_a[self.nbit-2-i],
+                self.in_b[self.nbit-2-i],
                 self.adders[i].out_carry)
             )
         self.adders.reverse()
