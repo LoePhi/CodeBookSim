@@ -17,7 +17,6 @@ class monitor(ElectricComponent):
         self.in_clock = in_clock
         self.mode = mode
 
-        self.backward_connections = []  # not used
         self.build_circuit()
 
     def build_circuit(self):

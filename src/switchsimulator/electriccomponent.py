@@ -41,28 +41,38 @@ class ElectricComponent():
         component = component[0] if len(component) == 1 else component
         setattr(self, port, component)
 
-    # def __repr__(self):
+    @staticmethod
+    def _prt_dict_atom(a):
+        if isinstance(a, ElectricComponent):
+            retstr = a.__class__.__name__ + ' at ' + hex(id(a))
+        else:
+            retstr = str(a)
+        return retstr
 
-    #     def object_to_str(o):
-    #         return str(type(o).__name__) + ' @ ' + hex(id(o))
+    @staticmethod
+    def _prt_collection(c):
+        str_list = []
+        for a in c:
+            str_list.append(ElectricComponent._prt_dict_elem(a))
+        return ', '.join(str_list)
 
-    #     def list_item_to_str(item):
-    #         if isinstance(item, ElectricComponent):
-    #             return object_to_str(item)
-    #         elif isinstance(item, tuple):  # forward_con stored as tuples
-    #             return object_to_str(item[0]) + ' <--> ' + item[1]
-    #         else:
-    #             raise NotImplementedError('What list is this?')
+    @staticmethod
+    def _prt_dict_elem(e):
+        if isinstance(e, list):
+            retstr = "[" + ElectricComponent._prt_collection(e) + "]"
+        elif isinstance(e, tuple):
+            retstr = "(" + ElectricComponent._prt_collection(e) + ")"
+        else:
+            retstr = ElectricComponent._prt_dict_atom(e)
+        return retstr
 
-    #     selfdict = self.__dict__
-    #     prtl = [object_to_str(self)]
-    #     for k in selfdict.keys():
-    #         if(isinstance(selfdict[k], ElectricComponent)):
-    #             prtl.append(k + ': ' + object_to_str(selfdict[k]))
-    #         elif(isinstance(selfdict[k], list)):
-    #             prtl.append(k + ': [' + ', '.join(
-    #                 [list_item_to_str(item) for item in selfdict[k]]
-    #             ) + ']')
-    #         else:
-    #             prtl.append(k + ': ' + str(selfdict[k]))
-    #     return '\n'.join(prtl)
+    def __repr__(self):
+        """
+        Mea culpa
+        """
+        retstr = ElectricComponent._prt_dict_atom(self) + ' '
+        retstr = retstr + str(self.__class__.__base__) + '\n'
+        sd = self.__dict__
+        for k in sd:
+            retstr = retstr + str(k) + ': ' + self._prt_dict_elem(sd[k]) + '\n'
+        return retstr

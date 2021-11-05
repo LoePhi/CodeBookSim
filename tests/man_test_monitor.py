@@ -40,3 +40,17 @@ test_clock_mode_counter()
 sleep(1)
 print("\nAdding:")
 test_update_mode_adder()
+
+
+def test_clockspeed():
+    sw = Switch(False)
+    cl = clock(sw, print_hz=True)
+    rc = RippleCounter(cl, 16)
+    sw.flip()
+    x = threading.Thread(target=cl.start)
+    x.start()
+    sleep(10)
+    sw.flip()
+
+
+test_clockspeed()

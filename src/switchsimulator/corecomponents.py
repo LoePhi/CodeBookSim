@@ -24,7 +24,6 @@ class CoreComponent(ElectricComponent):
 
     def setup(self):
         self.forward_connections = []
-        self.backward_connections = []  # not used
         self.build_circuit()
         self.compute_state()
 
@@ -38,9 +37,6 @@ class CoreComponent(ElectricComponent):
         """Called by downstream elements to add them as a forward connection"""
         if (con, port) not in self.forward_connections:
             self.forward_connections.append((con, port))
-        # backward connections can be used for debugging the circuit
-        if self not in con.backward_connections:
-            con.backward_connections.append(self)
 
     def forward_pass(self):
         for fc in self.forward_connections:
