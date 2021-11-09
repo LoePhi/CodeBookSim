@@ -1,5 +1,6 @@
 from switchsimulator.corecomponents import Switch
-from switchsimulator.misccomp import OnesComplement, Selector_2_1
+from switchsimulator.misccomp import Decoder_3_8, OnesComplement
+from switchsimulator.misccomp import Selector_2_1, Selector_8_1
 from switchsimulator.helpers import bts
 
 
@@ -30,3 +31,35 @@ def test_selector_2_1():
     sel2 = Selector_2_1(s2, s1, ss)
     assert(sel1.__str__() == s2.__str__())
     assert(sel2.__str__() == s1.__str__())
+
+
+def test_selector_8_1():
+    d = bts('11010000')
+    se = bts('000')
+    y = Selector_8_1(d, se)
+    assert not y.is_on
+    d[7].flip()
+    assert y.is_on
+    d[7].flip()
+    assert not y.is_on
+    se[0].flip()
+    assert y.is_on
+    se[1].flip()
+    assert y.is_on
+    se[2].flip()
+    assert y.is_on
+    se[0].flip()
+    assert not y.is_on
+
+
+def test_decoder_3_8():
+    d = Switch(True)
+    se = bts('000')
+    y = Decoder_3_8(d, se)
+    assert y.__str__() == '00000001'
+    d.flip()
+    assert y.__str__() == '00000000'
+    se[0].flip()
+    assert y.__str__() == '00000000'
+    d.flip()
+    assert y.__str__() == '00010000'

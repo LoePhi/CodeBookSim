@@ -4,13 +4,6 @@
 
 # TODO: sollten Tests wirklich aud __str__ basieren?
 
-# TODO: Use queue for updates
-# -> bsp. 8bitadder: bisher löst jede änderung eines bits eine Kaskade für sich aus
-# durch queue könnten alle gemeinsam erfolgen
-# !Auf Reihenfolge der bits achten! lsb zuerst
-# Achtung, könnte dazu führen dass iene Änderung die anderen überholt
-# -> neue Queue für jeden Clock-Tick
-
 # TODO: helpers -> überlegen wie weit ich hier abstrahieren möchte (zb selebr zwischen systemen kovertieren)
 # -> dann gute namen finden, richtig funktionen auswählen und tests schreiben
 
@@ -24,8 +17,6 @@
 # Andererseits kostet das auch nicht wirklich was und macht das inspizieren leichter
 # -> dann aber auch alle zuweisen (nicht self.out_main = AND(...))
 
-# TODO: durchgehen und überall type hints setzen (mypy --strict)
-
 # TODO: variable sized version von adder, latch, OnesComplement, ..?
 
 # List of not implemented circuits
@@ -34,6 +25,8 @@
 # oscillator, p. 157
 # Adding machines, p.168
 # Level-Triggered-8-Bit-Latch with clear, p. 170
+# Level-Triggered D-type flip-flop, p. 191 -> its the same as the other ltdtff, just with different labels and no qb
+# Level-Triggered-8-Bit-Latch, p. 192 -> same as the other one with differnt labels
 
 # List of modified circuits
 # Adding machine p. 170 - EdgeTriggered FF instead of Level-Triggered

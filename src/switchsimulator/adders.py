@@ -1,41 +1,35 @@
 from switchsimulator.memory import EdgeTrig8BitLatchPreCl
-from switchsimulator.electriccomponent import ElectricComponent
-from switchsimulator.corecomponents import OR, AND, autoparse, no_con
-from switchsimulator.secondarycomponents import SecondaryComponent
+from switchsimulator.base import SecondaryComponent
+from switchsimulator.base import autoparse, no_con, InputComponent
+from switchsimulator.corecomponents import OR, AND
 from switchsimulator.logicgates import XOR
 from switchsimulator.misccomp import OnesComplement
-from typing import List
+from typing import Sequence
 
 
 class HalfAdder(SecondaryComponent):
 
-    # inputs = ElectricComponent.unpack_io('in_a', 'in_b')
-    # outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
-
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = no_con(),
-                 in_b: ElectricComponent = no_con()):
+                 in_a: InputComponent = no_con(),
+                 in_b: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_b = in_b
 
         self.out_sum = XOR(self.in_a, self.in_b)
         self.out_carry = AND(self.in_a, self.in_b)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(int(self.out_carry.is_on)) + str(int(self.out_sum.is_on))
 
 
 class FullAdder(SecondaryComponent):
 
-    # inputs = ElectricComponent.unpack_io('in_a', 'in_b', 'in_carry')
-    # outputs = ElectricComponent.unpack_io('out_carry', 'out_sum')
-
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = no_con(),
-                 in_b: ElectricComponent = no_con(),
-                 in_carry: ElectricComponent = no_con()):
+                 in_a: InputComponent = no_con(),
+                 in_b: InputComponent = no_con(),
+                 in_carry: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_b = in_b
         self.in_carry = in_carry
@@ -46,20 +40,17 @@ class FullAdder(SecondaryComponent):
         self.out_sum = self.HA2.out_sum
         self.out_carry = OR(self.HA1.out_carry, self.HA2.out_carry)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(int(self.out_carry.is_on)) + str(int(self.out_sum.is_on))
 
 
 class Eight_Bit_Adder(SecondaryComponent):
 
-    # inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_carry')
-    # outputs = ElectricComponent.unpack_io('out_sum:8', 'out_carry')
-
     @autoparse
     def __init__(self,
-                 in_a: List[ElectricComponent] = no_con(8),
-                 in_b: List[ElectricComponent] = no_con(8),
-                 in_carry: ElectricComponent = no_con()):
+                 in_a: Sequence[InputComponent] = no_con(8),
+                 in_b: Sequence[InputComponent] = no_con(8),
+                 in_carry: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_b = in_b
         self.in_carry = in_carry
@@ -74,7 +65,7 @@ class Eight_Bit_Adder(SecondaryComponent):
         self.out_sum = [fa.out_sum for fa in self.adders]
         self.out_carry = self.adders[0].out_carry
 
-    def __str__(self):
+    def __str__(self) -> str:
         bitlist = [str(int(self.out_carry.is_on))] + ['_'] + \
             [str(int(b.is_on)) for b in self.out_sum]
         return ''.join(bitlist)
@@ -82,14 +73,11 @@ class Eight_Bit_Adder(SecondaryComponent):
 
 class Sixteen_Bit_Adder(SecondaryComponent):
 
-    # inputs = ElectricComponent.unpack_io('in_a:16', 'in_b:16', 'in_carry')
-    # outputs = ElectricComponent.unpack_io('out_sum:16', 'out_carry')
-
     @autoparse
     def __init__(self,
-                 in_a: List[ElectricComponent] = no_con(16),
-                 in_b: List[ElectricComponent] = no_con(16),
-                 in_carry: ElectricComponent = no_con()):
+                 in_a: Sequence[InputComponent] = no_con(16),
+                 in_b: Sequence[InputComponent] = no_con(16),
+                 in_carry: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_b = in_b
         self.in_carry = in_carry
@@ -102,7 +90,7 @@ class Sixteen_Bit_Adder(SecondaryComponent):
         self.out_sum = self.eba_high.out_sum + self.eba_low.out_sum
         self.out_carry = self.eba_high.out_carry
 
-    def __str__(self):
+    def __str__(self) -> str:
         bitlist = [str(int(self.out_carry.is_on))] + ['_'] + \
             [str(int(b.is_on)) for b in self.out_sum]
         return ''.join(bitlist)
@@ -114,9 +102,9 @@ class Adder(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_a: List[ElectricComponent],
-                 in_b: List[ElectricComponent],
-                 in_carry: ElectricComponent = no_con()):
+                 in_a: Sequence[InputComponent],
+                 in_b: Sequence[InputComponent],
+                 in_carry: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_b = in_b
         self.in_carry = in_carry
@@ -140,7 +128,7 @@ class Adder(SecondaryComponent):
         self.out_sum = [fa.out_sum for fa in self.adders]
         self.out_carry = self.adders[0].out_carry
 
-    def __str__(self):
+    def __str__(self) -> str:
         bitlist = [str(int(self.out_carry.is_on))] + ['_'] + \
             [str(int(b.is_on)) for b in self.out_sum]
         return ''.join(bitlist)
@@ -148,14 +136,11 @@ class Adder(SecondaryComponent):
 
 class AddMin(SecondaryComponent):
 
-    # inputs = ElectricComponent.unpack_io('in_a:8', 'in_b:8', 'in_sub')
-    # outputs = ElectricComponent.unpack_io('out_sum:8', 'out_flow')
-
     @autoparse
     def __init__(self,
-                 in_a: List[ElectricComponent] = no_con(8),
-                 in_b: List[ElectricComponent] = no_con(8),
-                 in_sub: ElectricComponent = no_con()):
+                 in_a: Sequence[InputComponent] = no_con(8),
+                 in_b: Sequence[InputComponent] = no_con(8),
+                 in_sub: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_b = in_b
         self.in_sub = in_sub
@@ -166,7 +151,7 @@ class AddMin(SecondaryComponent):
         self.out_sum = self.eba1.out_sum
         self.out_flow = XOR(self.eba1.out_carry, self.in_sub)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if not self.out_flow.is_on:
             control = ""
         elif self.in_sub.is_on:
@@ -188,9 +173,9 @@ class AddingMachine2(SecondaryComponent):
 
     @autoparse
     def __init__(self,
-                 in_a: List[ElectricComponent] = no_con(8),
-                 in_add: ElectricComponent = no_con(),
-                 in_clear: ElectricComponent = no_con()) -> None:
+                 in_a: Sequence[InputComponent] = no_con(8),
+                 in_add: InputComponent = no_con(),
+                 in_clear: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_add = in_add
         self.in_clear = in_clear
@@ -202,6 +187,6 @@ class AddingMachine2(SecondaryComponent):
 
         self.out_bulbs = self.ebl.out_q
 
-    def __str__(self):
+    def __str__(self) -> str:
         bitlist = [str(int(b.is_on)) for b in self.out_bulbs]
         return ''.join(bitlist)

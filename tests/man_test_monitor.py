@@ -1,5 +1,5 @@
 from switchsimulator.corecomponents import Switch
-from switchsimulator.monitor import monitor
+from switchsimulator.monitor import Lightbulbs
 from switchsimulator.clocks import clock, RippleCounter
 from switchsimulator.adders import AddingMachine2
 from switchsimulator.helpers import bts
@@ -11,7 +11,7 @@ def test_clock_mode_counter():
     sw = Switch(False)
     cl = clock(sw)
     rc = RippleCounter(cl, 16)
-    mon = monitor(rc.out_main, cl)
+    mon = Lightbulbs(rc.out_main, cl)
     sw.flip()
     x = threading.Thread(target=cl.start)
     x.start()
@@ -25,7 +25,7 @@ def test_update_mode_adder():
     bits = bts('00000010')
 
     am = AddingMachine2(bits, s_add, s_clear)
-    mon = monitor(am.out_bulbs, mode='update')
+    mon = Lightbulbs(am.out_bulbs, mode='update')
 
     s_clear.close()
     s_clear.open()

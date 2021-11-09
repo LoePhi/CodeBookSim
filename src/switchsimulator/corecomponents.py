@@ -1,56 +1,5 @@
-from typing import Callable, List, Optional, Tuple
-from switchsimulator.electriccomponent import ElectricComponent
-import inspect
-from functools import wraps
-
-
-class CoreComponent(ElectricComponent):
-    """
-    Parent Class for all core components
-    These are the basic buidling blocks that all
-    other components are assembled from
-
-    All core components have a singlaur output-line
-    called 'out_main'
-    """
-
-    out_main: bool
-
-    def compute_state(self) -> None:
-        raise NotImplementedError
-
-    def build_circuit(self) -> None:
-        raise NotImplementedError
-
-    def setup(self) -> None:
-        self.forward_connections: List[Tuple[CoreComponent, str]] = []
-        self.build_circuit()
-        self.compute_state()
-
-    def get_state(self) -> bool:
-        """Returns the current state of the output"""
-        return self.out_main
-
-    is_on = property(get_state)
-
-    def add_connection(self, con: 'CoreComponent', port: str) -> None:
-        """Called by downstream elements to add them as a forward connection"""
-        if (con, port) not in self.forward_connections:
-            self.forward_connections.append((con, port))
-
-    def forward_pass(self) -> None:
-        for fc in self.forward_connections:
-            fc[0].update()
-
-    # TODO: ?keep state
-    def update(self) -> None:
-        old_state = self.out_main
-        self.compute_state()
-        if self.out_main != old_state:
-            self.forward_pass()
-
-    def __str__(self) -> str:
-        return str(int(self.out_main))
+from switchsimulator.base import CoreComponent
+from switchsimulator.base import autoparse, no_con, InputComponent
 
 
 class Switch(CoreComponent):
@@ -82,75 +31,6 @@ class Switch(CoreComponent):
         self.forward_pass()
 
 
-class LooseWire(CoreComponent):
-    """
-    This component is used solely for initializing unconnected inputs
-    It never carries a current
-    """
-
-    def __init__(self) -> None:
-        self.setup()
-
-    def build_circuit(self) -> None:
-        pass
-
-    def compute_state(self) -> None:
-        self.out_main = False
-
-
-class _LooseWireSentinel(ElectricComponent):
-
-    def __init__(self) -> None:
-        pass
-
-
-def no_con(n: Optional[int] = None):
-    """
-    ONLY for use with the @autoparse decorator.
-    LooseWires are temporary and will be exchanged by the decorator.
-    """
-    if n is None:
-        return _LooseWireSentinel()
-    else:
-        return [_LooseWireSentinel() for _ in range(n)]
-
-
-def exchange_sentinel(x):
-    if isinstance(x, list):
-        return [exchange_sentinel(e) for e in x]
-    elif isinstance(x, tuple):
-        return tuple(exchange_sentinel(e) for e in x)
-    elif isinstance(x, _LooseWireSentinel):
-        return LooseWire()
-    else:
-        return x
-
-
-def autoparse(init: Callable) -> Callable:
-    inispec = inspect.getfullargspec(init)
-    parnames = inispec.args[1:]
-    defaults = inispec.defaults
-
-    @wraps(init)
-    def wrapped_init(self, *args, **kwargs) -> None:
-        # Turn args into kwargs
-        kwargs.update(zip(parnames[:len(args)], args))
-
-        # apply default parameter values
-        default_start = len(parnames) - len(defaults)
-        for i in range(len(defaults)):
-            if parnames[default_start + i] not in kwargs:
-                kwargs[parnames[default_start + i]] = defaults[i]
-
-        # exchange Sentinels for LooseWires
-        for kw in kwargs:
-            kwargs[kw] = exchange_sentinel(kwargs[kw])
-
-        init(self, **kwargs)
-
-    return wrapped_init
-
-
 class INV(CoreComponent):
     """Inverts the input"""
 
@@ -161,7 +41,7 @@ class INV(CoreComponent):
     # elctric, core, secondary, singlestate
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = no_con()) -> None:
+                 in_a: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.setup()
 
@@ -181,8 +61,8 @@ class BaseGate(CoreComponent):
 
     @autoparse
     def __init__(self,
-                 in_a: ElectricComponent = no_con(),
-                 in_b: ElectricComponent = no_con()) -> None:
+                 in_a: InputComponent = no_con(),
+                 in_b: InputComponent = no_con()) -> None:
         self.in_a = in_a
         self.in_b = in_b
         self.setup()
