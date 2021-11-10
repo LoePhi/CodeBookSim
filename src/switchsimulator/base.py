@@ -1,11 +1,11 @@
-from typing import Any, Iterable, Sequence, Union, overload
+from typing import Any, Iterable, Iterator, Sequence, Union, overload
 from typing import List, Tuple, Optional, Callable, TypeVar
 from typing_extensions import ParamSpec
 import inspect
 from functools import wraps
 
 
-class ElectricComponent():
+class ElectricElement():
     """
     Parent class for all components of the electric circuit
     """
@@ -26,16 +26,17 @@ class ElectricComponent():
 
     def connect_input(self,
                       port: str,
-                      component: Union['ElectricComponent',
-                                       Sequence['ElectricComponent']]) -> None:
+                      component: Union['ElectricElement',
+                                       Sequence['ElectricElement']]) -> None:
         """
         Should be used if not all inputs were available at initialization
         """
 
         old_input = getattr(self, port)
-        old_input = old_input if isinstance(old_input, list) else [old_input]
+        old_input = old_input if isinstance(
+            old_input, Iterable) else [old_input]
 
-        if isinstance(component, ElectricComponent):
+        if not isinstance(component, Iterable):
             component = [component]
 
         if len(old_input) != len(component):
@@ -53,7 +54,7 @@ class ElectricComponent():
 
     @staticmethod
     def _prt_dict_atom(a: Any) -> str:
-        if isinstance(a, ElectricComponent):
+        if isinstance(a, ElectricElement):
             retstr = a.__class__.__name__ + ' at ' + hex(id(a))
         else:
             retstr = str(a)
@@ -63,24 +64,24 @@ class ElectricComponent():
     def _prt_collection(c: Iterable[Any]) -> str:
         str_list = []
         for a in c:
-            str_list.append(ElectricComponent._prt_dict_elem(a))
+            str_list.append(ElectricElement._prt_dict_elem(a))
         return ', '.join(str_list)
 
     @staticmethod
     def _prt_dict_elem(e: Any) -> str:
         if isinstance(e, list):
-            retstr = "[" + ElectricComponent._prt_collection(e) + "]"
+            retstr = "[" + ElectricElement._prt_collection(e) + "]"
         elif isinstance(e, tuple):
-            retstr = "(" + ElectricComponent._prt_collection(e) + ")"
+            retstr = "(" + ElectricElement._prt_collection(e) + ")"
         else:
-            retstr = ElectricComponent._prt_dict_atom(e)
+            retstr = ElectricElement._prt_dict_atom(e)
         return retstr
 
     def __repr__(self) -> str:
         """
         Mea culpa
         """
-        retstr = ElectricComponent._prt_dict_atom(self) + ' '
+        retstr = ElectricElement._prt_dict_atom(self) + ' '
         retstr = retstr + str(self.__class__.__base__) + '\n'
         sd = self.__dict__
         for k in sd:
@@ -88,7 +89,7 @@ class ElectricComponent():
         return retstr
 
 
-class CoreComponent(ElectricComponent):
+class CoreComponent(ElectricElement):
     """
     Parent Class for all core components
     These are the basic buidling blocks that all
@@ -129,7 +130,6 @@ class CoreComponent(ElectricComponent):
         for fc in self.forward_connections:
             fc[0].update()
 
-    # TODO: ?keep state
     def update(self) -> None:
         old_state = self.out_main
         self.compute_state()
@@ -222,7 +222,7 @@ def autoparse(init: Callable[_P, _R]) -> Callable[_P, _R]:  # type: ignore
     defaults = inispec.defaults
 
     @wraps(init)
-    def wrapped_init(self: ElectricComponent,
+    def wrapped_init(self: ElectricElement,
                      *args: _P.args,  # type: ignore
                      **kwargs: _P.kwargs) -> None:  # type: ignore
 
@@ -247,7 +247,7 @@ def autoparse(init: Callable[_P, _R]) -> Callable[_P, _R]:  # type: ignore
     return wrapped_init
 
 
-class SecondaryComponent(ElectricComponent):
+class CombinedCircuit(ElectricElement):
     """
     Parent class for componenets that are assembled from
     other components
@@ -256,9 +256,18 @@ class SecondaryComponent(ElectricComponent):
     pass
 
 
-class SingleStateSC(SecondaryComponent):
+class SingleOutCircuit(CombinedCircuit):
     """
-    This allows for its children to be used
+    Parent for all combined circuits with a a single
+    output of any size
+    """
+
+
+class SingleBitSOC(SingleOutCircuit):
+    """
+    For all Circuits that have a single 1-bit output
+
+    Circuits of this type can be used
     like basegates and other core components
 
     and1 = AND(s1)
@@ -272,7 +281,7 @@ class SingleStateSC(SecondaryComponent):
     and1.connect_input('in_b', xor1)
     """
 
-    out_main: Union[CoreComponent, 'SingleStateSC']
+    out_main: Union[CoreComponent, 'SingleBitSOC']
 
     def get_state(self) -> bool:
         return self.out_main.get_state()
@@ -292,10 +301,44 @@ class SingleStateSC(SecondaryComponent):
 # directly inputs. Secondary components have to be adressed
 # by there their ports, which are are also either CoreComponents
 # or SinglestateSC
-InputComponent = Union[CoreComponent, SingleStateSC, LooseWire]
+InputComponent = Union[CoreComponent, SingleBitSOC]
 
 
-class Monitor(ElectricComponent):
+class MultiBitSOC(SingleOutCircuit):
+    """
+    Parent class for all circuits that have
+    a single multibit output
+    """
+    out_main: Sequence[InputComponent]
+
+    def __str__(self) -> str:
+        bitlist = [str(int(b.is_on)) for b in self.out_main]
+        return ''.join(bitlist)
+
+    def __iter__(self) -> Iterator[InputComponent]:
+        for elem in self.out_main:
+            yield elem
+
+    def __len__(self) -> int:
+        return len(self.out_main)
+
+    def __getitem__(self, i: int) -> InputComponent:
+        return self.out_main[i]
+
+
+class MultiOutCircuit(CombinedCircuit):
+    """
+    Parent class for all circuits that have
+    multiple output (== adders)
+
+    When using these circuits as inputs, they
+    have to be adressed by naming their outputs
+    (e.g. x = HalfAdder(a,b); y = Halfadder(c,x.carry))
+    """
+    pass
+
+
+class Monitor(ElectricElement):
     """
     Parent class for all output devices
     """

@@ -1,11 +1,11 @@
-from switchsimulator.base import SecondaryComponent, SingleStateSC
+from switchsimulator.base import MultiBitSOC, SingleBitSOC
 from switchsimulator.base import no_con, autoparse, InputComponent
 from switchsimulator.corecomponents import AND, OR, INV
 from switchsimulator.logicgates import XOR, AND4, OR8
 from typing import Sequence
 
 
-class OnesComplement(SecondaryComponent):
+class OnesComplement(MultiBitSOC):
 
     @autoparse
     def __init__(self,
@@ -16,12 +16,8 @@ class OnesComplement(SecondaryComponent):
 
         self.out_main = [XOR(inp, self.in_invert) for inp in self.in_in]
 
-    def __str__(self) -> str:
-        bitlist = [str(int(b.is_on)) for b in self.out_main]
-        return ''.join(bitlist)
 
-
-class Selector_2_1(SingleStateSC):
+class Selector_2_1(SingleBitSOC):
 
     @autoparse
     def __init__(self,
@@ -38,7 +34,7 @@ class Selector_2_1(SingleStateSC):
         self.out_main = OR(self.and1, self.and2)
 
 
-class Selector_8_1(SingleStateSC):
+class Selector_8_1(SingleBitSOC):
     """
     select = '000' adresses the last lement in in_data
     """
@@ -57,11 +53,8 @@ class Selector_8_1(SingleStateSC):
         self.ands = [AND4(self.in_data[i], *bcd[i]) for i in range(8)]
         self.out_main = OR8(self.ands)
 
-    def __str__(self) -> str:
-        return str(int(self.out_main.is_on))
 
-
-class Decoder_3_8(SecondaryComponent):
+class Decoder_3_8(MultiBitSOC):
 
     @autoparse
     def __init__(self,
@@ -76,7 +69,3 @@ class Decoder_3_8(SecondaryComponent):
         bcd = [(b, c, d) for b in selc[0] for c in selc[1] for d in selc[2]]
         self.ands = [AND4(self.in_data, *bcd[i]) for i in range(8)]
         self.out_main = self.ands
-
-    def __str__(self) -> str:
-        bitlist = [str(int(b.is_on)) for b in self.out_main]
-        return ''.join(bitlist)

@@ -1,10 +1,10 @@
 from typing import Sequence
-from switchsimulator.base import SingleStateSC
+from switchsimulator.base import SingleBitSOC
 from switchsimulator.corecomponents import OR, AND, NAND, NOR
 from switchsimulator.base import autoparse, no_con, InputComponent
 
 
-class XOR(SingleStateSC):
+class XOR(SingleBitSOC):
     """XOR-Gate"""
 
     @autoparse
@@ -19,7 +19,7 @@ class XOR(SingleStateSC):
         self.out_main = AND(self.or1, self.nand1)
 
 
-class NOR3(SingleStateSC):
+class NOR3(SingleBitSOC):
     """3-way NOR-Gate"""
 
     @autoparse
@@ -34,7 +34,7 @@ class NOR3(SingleStateSC):
         self.out_main = NOR(OR(self.in_a, self.in_b), self.in_c)
 
 
-class AND4(SingleStateSC):
+class AND4(SingleBitSOC):
     """4-way AND-Gate"""
 
     @autoparse
@@ -53,7 +53,7 @@ class AND4(SingleStateSC):
         self.out_main = AND(self.and1, self.and2)
 
 
-class OR8(SingleStateSC):
+class OR8(SingleBitSOC):
     """
     8-way OR-gate
     """

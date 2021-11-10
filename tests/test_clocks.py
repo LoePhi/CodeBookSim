@@ -21,5 +21,5 @@ def test_clock_counter():
     x.start()
     sleep(.1)
     sw.flip()
-    outp = [b.is_on for b in rc.out_main[:14]]
+    outp = [b.is_on for b in rc[:14]]
     assert sum(outp) > 1

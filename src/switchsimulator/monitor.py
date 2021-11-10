@@ -5,7 +5,7 @@ from typing import List
 
 class Lightbulbs(Monitor):
     """
-    not really core because out_main has more than 1 bit
+    just some lightbulbs
     """
 
     @autoparse

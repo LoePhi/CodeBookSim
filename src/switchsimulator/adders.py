@@ -1,5 +1,5 @@
 from switchsimulator.memory import EdgeTrig8BitLatchPreCl
-from switchsimulator.base import SecondaryComponent
+from switchsimulator.base import MultiBitSOC, MultiOutCircuit
 from switchsimulator.base import autoparse, no_con, InputComponent
 from switchsimulator.corecomponents import OR, AND
 from switchsimulator.logicgates import XOR
@@ -7,7 +7,7 @@ from switchsimulator.misccomp import OnesComplement
 from typing import Sequence
 
 
-class HalfAdder(SecondaryComponent):
+class HalfAdder(MultiOutCircuit):
 
     @autoparse
     def __init__(self,
@@ -23,7 +23,7 @@ class HalfAdder(SecondaryComponent):
         return str(int(self.out_carry.is_on)) + str(int(self.out_sum.is_on))
 
 
-class FullAdder(SecondaryComponent):
+class FullAdder(MultiOutCircuit):
 
     @autoparse
     def __init__(self,
@@ -44,7 +44,7 @@ class FullAdder(SecondaryComponent):
         return str(int(self.out_carry.is_on)) + str(int(self.out_sum.is_on))
 
 
-class Eight_Bit_Adder(SecondaryComponent):
+class Eight_Bit_Adder(MultiOutCircuit):
 
     @autoparse
     def __init__(self,
@@ -71,7 +71,7 @@ class Eight_Bit_Adder(SecondaryComponent):
         return ''.join(bitlist)
 
 
-class Sixteen_Bit_Adder(SecondaryComponent):
+class Sixteen_Bit_Adder(MultiOutCircuit):
 
     @autoparse
     def __init__(self,
@@ -96,8 +96,10 @@ class Sixteen_Bit_Adder(SecondaryComponent):
         return ''.join(bitlist)
 
 
-class Adder(SecondaryComponent):
+class Adder(MultiOutCircuit):
     """
+    An Adder that takes inputs of arbitrary length.
+    I might remove it
     """
 
     @autoparse
@@ -134,7 +136,7 @@ class Adder(SecondaryComponent):
         return ''.join(bitlist)
 
 
-class AddMin(SecondaryComponent):
+class AddMin(MultiOutCircuit):
 
     @autoparse
     def __init__(self,
@@ -146,7 +148,7 @@ class AddMin(SecondaryComponent):
         self.in_sub = in_sub
 
         self.oc1 = OnesComplement(self.in_b, self.in_sub)
-        self.eba1 = Eight_Bit_Adder(self.in_a, self.oc1.out_main, self.in_sub)
+        self.eba1 = Eight_Bit_Adder(self.in_a, self.oc1, self.in_sub)
 
         self.out_sum = self.eba1.out_sum
         self.out_flow = XOR(self.eba1.out_carry, self.in_sub)
@@ -162,7 +164,7 @@ class AddMin(SecondaryComponent):
         return ''.join(bitlist)
 
 
-class AddingMachine2(SecondaryComponent):
+class AddingMachine2(MultiBitSOC):
     """
     The second of two adding machines (p. 170)
     !!! Because the monkeys are not very good at pressing
@@ -183,10 +185,7 @@ class AddingMachine2(SecondaryComponent):
         self.eba = Eight_Bit_Adder(self.in_a)
         self.ebl = EdgeTrig8BitLatchPreCl(
             self.eba.out_sum, self.in_add, in_clear=self.in_clear)
-        self.eba.connect_input('in_b', self.ebl.out_q)
+        self.eba.connect_input('in_b', self.ebl)
 
-        self.out_bulbs = self.ebl.out_q
-
-    def __str__(self) -> str:
-        bitlist = [str(int(b.is_on)) for b in self.out_bulbs]
-        return ''.join(bitlist)
+        self.out_bulbs = self.ebl
+        self.out_main = self.out_bulbs

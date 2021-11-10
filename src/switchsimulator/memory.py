@@ -1,12 +1,18 @@
 from typing import Sequence
-from switchsimulator.base import SecondaryComponent
+from switchsimulator.base import MultiBitSOC, SingleBitSOC
 from switchsimulator.base import autoparse, no_con, InputComponent
 from switchsimulator.corecomponents import AND, INV, NOR, OR
 from switchsimulator.logicgates import NOR3
 from switchsimulator.misccomp import Decoder_3_8, Selector_8_1
 
 
-class RSFlipFlop(SecondaryComponent):
+class RSFlipFlop(SingleBitSOC):
+    """
+    Although all flipflops have two outputs, these outputs
+    are always opposites of each other which is why the FFs
+    are modeled as SingleBit-Circuits.
+    out_q is taken as the main output
+    """
 
     @autoparse
     def __init__(self,
@@ -22,13 +28,18 @@ class RSFlipFlop(SecondaryComponent):
         self.out_q = self.nor1
         self.out_qb = self.nor2
 
-    def __str__(self) -> str:
-        if not (self.out_q.is_on or self.out_qb.is_on):
-            raise ValueError("Bad Innput to RS-FlipFlop")
-        return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        self.out_main = self.out_q
+
+    def __str__(self, full: bool = False) -> str:
+        if full:
+            if not (self.out_q.is_on + self.out_qb.is_on) == 1:
+                raise ValueError("Bad Innput to RS-FlipFlop")
+            return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        else:
+            return super().__str__()
 
 
-class LevelTrigDTFlipFlop(SecondaryComponent):
+class LevelTrigDTFlipFlop(SingleBitSOC):
 
     @autoparse
     def __init__(self,
@@ -44,11 +55,16 @@ class LevelTrigDTFlipFlop(SecondaryComponent):
         self.out_q = self.rsff1.out_q
         self.out_qb = self.rsff1.out_qb
 
-    def __str__(self) -> str:
-        return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        self.out_main = self.out_q
+
+    def __str__(self, full: bool = False) -> str:
+        if full:
+            return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        else:
+            return super().__str__()
 
 
-class LevelTrigDTFlipFlopCl(SecondaryComponent):
+class LevelTrigDTFlipFlopCl(SingleBitSOC):
 
     @autoparse
     def __init__(self,
@@ -67,11 +83,16 @@ class LevelTrigDTFlipFlopCl(SecondaryComponent):
         self.out_q = self.rsff1.out_q
         self.out_qb = self.rsff1.out_qb
 
-    def __str__(self) -> str:
-        return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        self.out_main = self.out_q
+
+    def __str__(self, full: bool = False) -> str:
+        if full:
+            return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        else:
+            return super().__str__()
 
 
-class EdgeTrigDTFlipFlop(SecondaryComponent):
+class EdgeTrigDTFlipFlop(SingleBitSOC):
 
     @autoparse
     def __init__(self,
@@ -87,11 +108,16 @@ class EdgeTrigDTFlipFlop(SecondaryComponent):
         self.out_q = self.dtff2.out_q
         self.out_qb = self.dtff2.out_qb
 
-    def __str__(self) -> str:
-        return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        self.out_main = self.out_q
+
+    def __str__(self, full: bool = False) -> str:
+        if full:
+            return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        else:
+            return super().__str__()
 
 
-class EdgeTrigDTFlipFlopPreCl(SecondaryComponent):
+class EdgeTrigDTFlipFlopPreCl(SingleBitSOC):
 
     @autoparse
     def __init__(self,
@@ -119,14 +145,19 @@ class EdgeTrigDTFlipFlopPreCl(SecondaryComponent):
         self.nor22 = NOR3(self.nor21, self.in_preset, self.nor13)
         self.nor21.connect_input('in_c', self.nor22)
 
-        self.out_q = self.nor21.out_main
-        self.out_qb = self.nor22.out_main
+        self.out_q = self.nor21
+        self.out_qb = self.nor22
 
-    def __str__(self) -> str:
-        return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        self.out_main = self.out_q
+
+    def __str__(self, full: bool = False) -> str:
+        if full:
+            return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
+        else:
+            return super().__str__()
 
 
-class LevelTrig8BitLatch(SecondaryComponent):
+class LevelTrig8BitLatch(MultiBitSOC):
     """
     documentation
     """
@@ -139,16 +170,13 @@ class LevelTrig8BitLatch(SecondaryComponent):
         self.in_data = in_data
         self.in_clock = in_clock
 
-        self.dtff = [LevelTrigDTFlipFlop(
+        self.out_q = [LevelTrigDTFlipFlop(
             d, self.in_clock) for d in self.in_data]
 
-        self.out_q = [dtf.out_q for dtf in self.dtff]
-
-    def __str__(self) -> str:
-        return ''.join([str(int(q.is_on)) for q in self.out_q])
+        self.out_main = self.out_q
 
 
-class EdgeTrig8BitLatchPreCl(SecondaryComponent):
+class EdgeTrig8BitLatchPreCl(MultiBitSOC):
 
     @autoparse
     def __init__(self,
@@ -162,17 +190,14 @@ class EdgeTrig8BitLatchPreCl(SecondaryComponent):
         self.in_preset = in_preset
         self.in_clear = in_clear
 
-        self.etff = [EdgeTrigDTFlipFlopPreCl(
+        self.out_q = [EdgeTrigDTFlipFlopPreCl(
             d, self.in_clock, self.in_preset, self.in_clear)
             for d in self.in_data]
 
-        self.out_q = [dtf.out_q for dtf in self.etff]
-
-    def __str__(self) -> str:
-        return ''.join([str(int(q.is_on)) for q in self.out_q])
+        self.out_main = self.out_q
 
 
-class RAM_8_1(SecondaryComponent):
+class RAM_8_1(SingleBitSOC):
 
     @autoparse
     def __init__(self,
@@ -186,10 +211,8 @@ class RAM_8_1(SecondaryComponent):
 
         self.dec38 = Decoder_3_8(self.in_write, self.in_select)
         self.latches = [
-            LevelTrigDTFlipFlop(self.in_data, self.dec38.out_main[i]).out_q
+            LevelTrigDTFlipFlop(self.in_data, self.dec38[i])
             for i in range(8)]
         self.sel_8_1 = Selector_8_1(self.latches, self.in_select)
-        self.out_main = self.sel_8_1
 
-    def __str__(self, all: bool = False) -> str:
-        return str(int(self.out_main.is_on))
+        self.out_main = self.sel_8_1

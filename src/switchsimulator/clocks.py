@@ -1,13 +1,12 @@
-from typing import List
-from switchsimulator.base import CoreComponent, SecondaryComponent
-from switchsimulator.base import SingleStateSC
+from switchsimulator.base import MultiBitSOC
+from switchsimulator.base import SingleBitSOC
 from switchsimulator.corecomponents import INV, Switch, OR
 from switchsimulator.memory import EdgeTrigDTFlipFlop
 import time
 from switchsimulator.base import autoparse, no_con, InputComponent
 
 
-class book_oscillator(SingleStateSC):
+class book_oscillator(SingleBitSOC):
     """
     USE CLASS 'clock' INSTEAD
     The oscillator from p. 173
@@ -28,11 +27,12 @@ class book_oscillator(SingleStateSC):
         self.out_main = self.inv1
 
 
-class clock(SingleStateSC):
+class clock(SingleBitSOC):
     """
     Not actually a clock.
     Just a monkey flipping a Switch very fast
     """
+    out_main: Switch
 
     def __init__(self,
                  in_control: InputComponent = no_con(),
@@ -51,7 +51,6 @@ class clock(SingleStateSC):
             kcycl = 100
         while(self.in_control.is_on):
             time.sleep(self.delay)
-            assert isinstance(self.out_main, Switch)
             self.out_main.flip()
             if self.print_hz:
                 counter = counter + 1
@@ -63,7 +62,7 @@ class clock(SingleStateSC):
                     timestmp = newtime
 
 
-class RippleCounter(SecondaryComponent):
+class RippleCounter(MultiBitSOC):
     """
     Ripple-Counter, p. 177
     ! This one can be changed to any bitsize
@@ -86,9 +85,5 @@ class RippleCounter(SecondaryComponent):
             self.ffs.append(ff_tmp)
 
         self.ffs.reverse()
-        self.out_main: List[CoreComponent] = [ff.out_q for ff in self.ffs]
+        self.out_main = self.ffs
         self.out_main.append(self.inv1)
-
-    def __str__(self) -> str:
-        bitlist = [str(int(b.is_on)) for b in self.out_main]
-        return ''.join(bitlist)

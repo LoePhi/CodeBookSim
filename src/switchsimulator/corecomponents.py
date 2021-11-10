@@ -34,11 +34,6 @@ class Switch(CoreComponent):
 class INV(CoreComponent):
     """Inverts the input"""
 
-    # inputs = ElectricComponent.unpack_io('in_a', )
-
-    # TODO: type check darf Core, SingleState
-    # -> module umstrukturienen: baseclasses mit
-    # elctric, core, secondary, singlestate
     @autoparse
     def __init__(self,
                  in_a: InputComponent = no_con()) -> None:
