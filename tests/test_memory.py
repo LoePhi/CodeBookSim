@@ -1,6 +1,6 @@
 import pytest
 from switchsimulator.corecomponents import Switch
-from switchsimulator.memory import EdgeTrig8BitLatchPreCl, RSFlipFlop
+from switchsimulator.memory import RAM_8_1, EdgeTrig8BitLatchPreCl, RSFlipFlop
 from switchsimulator.memory import LevelTrigDTFlipFlop, LevelTrigDTFlipFlopCl
 from switchsimulator.memory import EdgeTrigDTFlipFlop, EdgeTrigDTFlipFlopPreCl
 from switchsimulator.memory import LevelTrig8BitLatch
@@ -200,3 +200,28 @@ def test_edget_8_bit_latch_precl():
     assert(ebl1.__str__() == '00000000')
     clock.open()
     assert(ebl1.__str__() == '00000000')
+
+
+def test_ram_8_1():
+    d = Switch(False)
+    se = bts('001')
+    w = Switch(True)
+    ra = RAM_8_1(d, se, w)
+    assert ra.__str__() == '0'
+    for s0 in range(2):
+        for s1 in range(2):
+            for s2 in range(2):
+                se[2].flip()
+                assert ra.__str__() == '0'
+            se[1].flip()
+        se[0].flip()
+    # Adresse jetzt bei '111'
+    w.flip()
+    d.flip()
+    assert ra.__str__() == '0'
+    w.flip()
+    assert ra.__str__() == '1'
+    se[2].flip()
+    assert ra.__str__() == '1'
+    d.flip()
+    assert ra.__str__() == '0'

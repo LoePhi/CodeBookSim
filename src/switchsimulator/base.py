@@ -1,5 +1,6 @@
 from typing import Any, Iterable, Sequence, Union, overload
-from typing import List, Tuple, Optional, Callable
+from typing import List, Tuple, Optional, Callable, TypeVar
+from typing_extensions import ParamSpec
 import inspect
 from functools import wraps
 
@@ -209,14 +210,21 @@ def exchange_sentinel(x: Union[
         return x
 
 
-def autoparse(init: Callable[..., None]) -> Callable[..., None]:
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
+
+
+# remove type ignore when mypy has support for paramspec
+# https://github.com/python/mypy/issues/8645
+def autoparse(init: Callable[_P, _R]) -> Callable[_P, _R]:  # type: ignore
     inispec = inspect.getfullargspec(init)
     parnames: List[str] = inispec.args[1:]
     defaults = inispec.defaults
 
     @wraps(init)
     def wrapped_init(self: ElectricComponent,
-                     *args: Any, **kwargs: Any) -> None:
+                     *args: _P.args,  # type: ignore
+                     **kwargs: _P.kwargs) -> None:  # type: ignore
 
         # Turn args into kwargs
         kwargs.update(zip(parnames[:len(args)], args))

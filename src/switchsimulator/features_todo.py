@@ -11,13 +11,16 @@
 
 # TODO: read, understand https://codereview.stackexchange.com/questions/269579/decorating-init-for-automatic-attribute-assignment-safe-and-good-practice
 
-# TODO: remove main_out from multibit components
-
 # TODO: ?nicht alle Zwischenelemente der Instanz zuweisen -> können auch über connections gefunden werden
 # Andererseits kostet das auch nicht wirklich was und macht das inspizieren leichter
 # -> dann aber auch alle zuweisen (nicht self.out_main = AND(...))
 
-# TODO: variable sized version von adder, latch, OnesComplement, ..?
+# TODO: main_out für alle multibit-Secondary Components die nur einen Output haben
+# -> in eigene Klasse packen
+# -> darin über __getitem__, __iter__ an main_out verweisen
+# -> AddingMachine2, RippleCounter, LevelTrig8BitLatch, EdgeTrig8BitLatchPreCl, OnesComplement, Decoder_3_8, RAM...
+
+# autoparse fix: https://github.com/microsoft/pyright/issues/774
 
 # List of not implemented circuits
 # And3, p. 115 

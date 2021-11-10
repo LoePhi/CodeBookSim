@@ -3,6 +3,7 @@ from switchsimulator.base import SecondaryComponent
 from switchsimulator.base import autoparse, no_con, InputComponent
 from switchsimulator.corecomponents import AND, INV, NOR, OR
 from switchsimulator.logicgates import NOR3
+from switchsimulator.misccomp import Decoder_3_8, Selector_8_1
 
 
 class RSFlipFlop(SecondaryComponent):
@@ -126,6 +127,9 @@ class EdgeTrigDTFlipFlopPreCl(SecondaryComponent):
 
 
 class LevelTrig8BitLatch(SecondaryComponent):
+    """
+    documentation
+    """
 
     @autoparse
     def __init__(self,
@@ -166,3 +170,26 @@ class EdgeTrig8BitLatchPreCl(SecondaryComponent):
 
     def __str__(self) -> str:
         return ''.join([str(int(q.is_on)) for q in self.out_q])
+
+
+class RAM_8_1(SecondaryComponent):
+
+    @autoparse
+    def __init__(self,
+                 in_data: InputComponent = no_con(),
+                 in_select: Sequence[InputComponent] = no_con(3),
+                 in_write: InputComponent = no_con()) -> None:
+
+        self.in_data = in_data
+        self.in_select = in_select
+        self.in_write = in_write
+
+        self.dec38 = Decoder_3_8(self.in_write, self.in_select)
+        self.latches = [
+            LevelTrigDTFlipFlop(self.in_data, self.dec38.out_main[i]).out_q
+            for i in range(8)]
+        self.sel_8_1 = Selector_8_1(self.latches, self.in_select)
+        self.out_main = self.sel_8_1
+
+    def __str__(self, all: bool = False) -> str:
+        return str(int(self.out_main.is_on))
