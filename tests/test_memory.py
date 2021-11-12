@@ -1,6 +1,7 @@
 import pytest
 from switchsimulator.corecomponents import Switch
-from switchsimulator.memory import RAM_8_1, EdgeTrig8BitLatchPreCl, RSFlipFlop
+from switchsimulator.memory import RAM_16_1, RAM_8_1, RAM_8_2
+from switchsimulator.memory import EdgeTrig8BitLatchPreCl, RSFlipFlop
 from switchsimulator.memory import LevelTrigDTFlipFlop, LevelTrigDTFlipFlopCl
 from switchsimulator.memory import EdgeTrigDTFlipFlop, EdgeTrigDTFlipFlopPreCl
 from switchsimulator.memory import LevelTrig8BitLatch
@@ -206,7 +207,7 @@ def test_edget_8_bit_latch_precl():
 
 def test_ram_8_1():
     d = Switch(False)
-    se = bts('001')
+    se = bts('000')
     w = Switch(True)
     ra = RAM_8_1(d, se, w)
     assert ra.__str__() == '0'
@@ -217,13 +218,81 @@ def test_ram_8_1():
                 assert ra.__str__() == '0'
             se[1].flip()
         se[0].flip()
-    # Adresse jetzt bei '111'
-    w.flip()
+    # Adresse jetzt bei '000'
+    w.flip()  # F
+    d.flip()  # T
+    assert ra.__str__() == '0'
+    w.flip()  # T
+    assert ra.__str__() == '1'
+    se[2].flip()  # 001
+    assert ra.__str__() == '1'
     d.flip()
     assert ra.__str__() == '0'
     w.flip()
+    se[2].flip()  # 000
     assert ra.__str__() == '1'
-    se[2].flip()
-    assert ra.__str__() == '1'
-    d.flip()
+
+
+def test_ram_16_1():
+    d = Switch(False)
+    se = bts('0000')
+    w = Switch(True)
+    ra = RAM_16_1(d, se, w)
     assert ra.__str__() == '0'
+    for s0 in range(2):
+        for s1 in range(2):
+            for s2 in range(2):
+                for s3 in range(2):
+                    se[3].flip()
+                    assert ra.__str__() == '0'
+                se[2].flip()
+            se[1].flip()
+        se[0].flip()
+    # Adresse jetzt bei '0000'
+    w.flip()  # F
+    d.flip()  # T
+    assert ra.__str__() == '0'
+    w.flip()  # T
+    assert ra.__str__() == '1'
+    se[2].flip()  # 0010
+    assert ra.__str__() == '1'
+    d.flip()  # F
+    assert ra.__str__() == '0'
+    d.flip()  # T
+    assert ra.__str__() == '1'
+    se[0].flip()  # 0011
+    assert ra.__str__() == '1'
+    d.flip()  # F
+    assert ra.__str__() == '0'
+    w.flip()  # F
+    se[0].flip()  # 0010
+    assert ra.__str__() == '1'
+
+
+def test_ram_8_2():
+    d = bts('00')
+    se = bts('000')
+    w = Switch(True)
+    ra = RAM_8_2(d, se, w)
+    assert ra.__str__() == '00'
+    for s0 in range(2):
+        for s1 in range(2):
+            for s2 in range(2):
+                se[2].flip()
+                assert ra.__str__() == '00'
+            se[1].flip()
+        se[0].flip()
+    # Adresse jetzt bei '000'
+    w.flip()  # F
+    d[0].flip()  # T
+    assert ra.__str__() == '00'
+    w.flip()  # T
+    assert ra.__str__() == '10'
+    se[2].flip()  # 001
+    assert ra.__str__() == '10'
+    d[0].flip()
+    d[1].flip()
+    assert ra.__str__() == '01'
+    w.flip()
+    se[2].flip()  # 000
+    assert ra.__str__() == '10'

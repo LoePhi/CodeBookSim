@@ -89,6 +89,9 @@ class ElectricElement():
         return retstr
 
 
+_fc_type = List[Tuple[Union['CoreComponent', 'Monitor'], str]]
+
+
 class CoreComponent(ElectricElement):
     """
     Parent Class for all core components
@@ -108,8 +111,8 @@ class CoreComponent(ElectricElement):
         raise NotImplementedError
 
     def setup(self) -> None:
-        T = List[Tuple[Union[CoreComponent, Monitor], str]]
-        self.forward_connections: T = []
+
+        self.forward_connections: _fc_type = []
         self.build_circuit()
         self.compute_state()
 
@@ -123,8 +126,12 @@ class CoreComponent(ElectricElement):
                        con: Union['CoreComponent', 'Monitor'],
                        port: str) -> None:
         """Called by downstream elements to add them as a forward connection"""
-        if (con, port) not in self.forward_connections:
-            self.forward_connections.append((con, port))
+        # TODO: think about whether to place this check
+        # somwhere else or if it is even needed. Here, it
+        # makes construction awfully slow for large amounts
+        # of forward_connections
+        # if (con, port) not in self.forward_connections:
+        self.forward_connections.append((con, port))
 
     def forward_pass(self) -> None:
         for fc in self.forward_connections:
@@ -156,41 +163,41 @@ class LooseWire(CoreComponent):
         self.out_main = False
 
 
-class _LooseWireSentinel(LooseWire):
+class _LWSent(LooseWire):
 
     def __init__(self) -> None:
         pass
 
 
 @overload
-def no_con(n: int) -> List[_LooseWireSentinel]:
+def no_con(n: int) -> List[_LWSent]:
     ...
 
 
 @overload
-def no_con() -> _LooseWireSentinel:
+def no_con() -> _LWSent:
     ...
 
 
 def no_con(n: Optional[int] = None) -> Union[
-        _LooseWireSentinel, List[_LooseWireSentinel]]:
+        _LWSent, List[_LWSent]]:
     """
     ONLY for use with the @autoparse decorator.
     LooseWires are temporary and will be exchanged by the decorator.
     """
     if n is None:
-        return _LooseWireSentinel()
+        return _LWSent()
     else:
-        return [_LooseWireSentinel() for _ in range(n)]
+        return [_LWSent() for _ in range(n)]
 
 
 @overload
-def exchange_sentinel(x: Sequence[_LooseWireSentinel]) -> Sequence[LooseWire]:
+def exchange_sentinel(x: Sequence[_LWSent]) -> Sequence[LooseWire]:
     ...
 
 
 @overload
-def exchange_sentinel(x: _LooseWireSentinel) -> LooseWire:
+def exchange_sentinel(x: _LWSent) -> LooseWire:
     ...
 
 
@@ -200,11 +207,11 @@ def exchange_sentinel(x: Any) -> Any:
 
 
 def exchange_sentinel(x: Union[
-        Sequence[_LooseWireSentinel], _LooseWireSentinel, Any]) -> Union[
+        Sequence[_LWSent], _LWSent, Any]) -> Union[
         Sequence[LooseWire], LooseWire, Any]:
     if isinstance(x, list):
         return [exchange_sentinel(e) for e in x]
-    elif isinstance(x, _LooseWireSentinel):
+    elif isinstance(x, _LWSent):
         return LooseWire()
     else:
         return x

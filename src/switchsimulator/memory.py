@@ -3,7 +3,8 @@ from switchsimulator.base import MultiBitSOC, SingleBitSOC
 from switchsimulator.base import autoparse, no_con, InputComponent
 from switchsimulator.corecomponents import AND, INV, NOR, OR
 from switchsimulator.logicgates import NOR3
-from switchsimulator.misccomp import Decoder_3_8, Selector_8_1
+from switchsimulator.misccomp import Decoder_16_64K, Decoder_1_2, Decoder_3_8
+from switchsimulator.misccomp import Selector_2_1, Selector_8_1, Selector_64K_1
 
 
 class RSFlipFlop(SingleBitSOC):
@@ -209,10 +210,72 @@ class RAM_8_1(SingleBitSOC):
         self.in_select = in_select
         self.in_write = in_write
 
-        self.dec38 = Decoder_3_8(self.in_write, self.in_select)
-        self.latches = [
-            LevelTrigDTFlipFlop(self.in_data, self.dec38[i])
-            for i in range(8)]
-        self.sel_8_1 = Selector_8_1(self.latches, self.in_select)
+        self.dec = Decoder_3_8(self.in_write, self.in_select)
+        self.latches = [LevelTrigDTFlipFlop(self.in_data, d) for d in self.dec]
+        self.sel = Selector_8_1(self.latches, self.in_select)
 
-        self.out_main = self.sel_8_1
+        self.out_main = self.sel
+
+
+class RAM_8_2(MultiBitSOC):
+    """
+    p. 199
+    """
+
+    @autoparse
+    def __init__(self,
+                 in_data: Sequence[InputComponent] = no_con(2),
+                 in_select: Sequence[InputComponent] = no_con(3),
+                 in_write: InputComponent = no_con()) -> None:
+
+        self.in_data = in_data
+        self.in_select = in_select
+        self.in_write = in_write
+
+        self.ram1 = RAM_8_1(self.in_data[0], self.in_select, self.in_write)
+        self.ram2 = RAM_8_1(self.in_data[1], self.in_select, self.in_write)
+
+        self.out_main = [self.ram1, self.ram2]
+
+
+class RAM_16_1(SingleBitSOC):
+    """
+    The diagram in the book is wrong. This is the correct
+    implementation
+    """
+    # WIP
+    @autoparse
+    def __init__(self,
+                 in_data: InputComponent = no_con(),
+                 in_select: Sequence[InputComponent] = no_con(4),
+                 in_write: InputComponent = no_con()) -> None:
+
+        self.in_data = in_data
+        self.in_select = in_select
+        self.in_write = in_write
+
+        self.dec12 = Decoder_1_2(self.in_write, self.in_select[0])
+        self.ram1 = RAM_8_1(self.in_data, self.in_select[1:], self.dec12[0])
+        self.ram2 = RAM_8_1(self.in_data, self.in_select[1:], self.dec12[1])
+        self.sel21 = Selector_2_1(self.ram1, self.ram2, self.in_select[0])
+
+        self.out_main = self.sel21
+
+
+class RAM_64K_1(SingleBitSOC):
+
+    @autoparse
+    def __init__(self,
+                 in_data: InputComponent = no_con(),
+                 in_select: Sequence[InputComponent] = no_con(4),
+                 in_write: InputComponent = no_con()) -> None:
+
+        self.in_data = in_data
+        self.in_select = in_select
+        self.in_write = in_write
+
+        self.dec = Decoder_16_64K(self.in_write, self.in_select)
+        self.latches = [LevelTrigDTFlipFlop(self.in_data, d) for d in self.dec]
+        self.sel = Selector_64K_1(self.latches, self.in_select)
+
+        self.out_main = self.sel

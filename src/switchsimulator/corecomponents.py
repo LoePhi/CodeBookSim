@@ -1,4 +1,4 @@
-from switchsimulator.base import CoreComponent
+from switchsimulator.base import _LWSent, CoreComponent, LooseWire
 from switchsimulator.base import autoparse, no_con, InputComponent
 
 
@@ -54,12 +54,13 @@ class BaseGate(CoreComponent):
     Parent for the baisc logic gates
     """
 
-    @autoparse
+    # no @autoparse for speed reasons
     def __init__(self,
-                 in_a: InputComponent = no_con(),
-                 in_b: InputComponent = no_con()) -> None:
-        self.in_a = in_a
-        self.in_b = in_b
+                 in_a: InputComponent = _LWSent(),
+                 in_b: InputComponent = _LWSent()) -> None:
+
+        self.in_a = in_a if not isinstance(in_a, _LWSent) else LooseWire()
+        self.in_b = in_b if not isinstance(in_b, _LWSent) else LooseWire()
         self.setup()
 
     def build_circuit(self) -> None:

@@ -1,5 +1,5 @@
 from switchsimulator.corecomponents import Switch
-from switchsimulator.misccomp import Decoder_3_8, OnesComplement
+from switchsimulator.misccomp import Decoder_1_2, Decoder_3_8, OnesComplement
 from switchsimulator.misccomp import Selector_2_1, Selector_8_1
 from switchsimulator.helpers import bts
 
@@ -19,16 +19,16 @@ def test_selector_2_1():
     s1 = Switch(True)
     s2 = Switch(False)
     ss = Switch(False)
-    sel1 = Selector_2_1(s1, s2, ss)
-    sel2 = Selector_2_1(s2, s1, ss)
+    sel1 = Selector_2_1(s2, s1, ss)
+    sel2 = Selector_2_1(s1, s2, ss)
     assert(sel1.__str__() == s1.__str__())
     assert(sel2.__str__() == s2.__str__())
     ss.flip()
     assert(sel1.__str__() == s2.__str__())
     assert(sel2.__str__() == s1.__str__())
     ss = Switch(True)
-    sel1 = Selector_2_1(s1, s2, ss)
-    sel2 = Selector_2_1(s2, s1, ss)
+    sel1 = Selector_2_1(s2, s1, ss)
+    sel2 = Selector_2_1(s1, s2, ss)
     assert(sel1.__str__() == s2.__str__())
     assert(sel2.__str__() == s1.__str__())
 
@@ -63,3 +63,16 @@ def test_decoder_3_8():
     assert y.__str__() == '00000000'
     d.flip()
     assert y.__str__() == '00010000'
+
+
+def test_decoder_1_2():
+    d = Switch(True)
+    se = Switch(False)
+    y = Decoder_1_2(d, se)
+    assert y.__str__() == '01'
+    d.flip()
+    assert y.__str__() == '00'
+    se.flip()
+    assert y.__str__() == '00'
+    d.flip()
+    assert y.__str__() == '10'

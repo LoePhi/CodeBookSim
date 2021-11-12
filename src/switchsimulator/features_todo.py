@@ -13,7 +13,7 @@
 # Müsste aber eigentlich Iterable+"Indexable" sein
 
 # List of not implemented circuits
-# And3, p. 115 
+# And3, p. 115
 # Buffer, p. 128
 # Adding machine Nr1, p.168
 # Level-Triggered-8-Bit-Latch with clear, p. 170
@@ -24,6 +24,7 @@
 # oscillator, p. 157
 # Adding machine p. 170 - EdgeTriggered FF instead of Level-Triggered
 # 8-Bit Ripple Counter - Generalized to any numer of bits
+# 16x1 RAM, p.200 (Circuit in book is defect)
 
 # new components
 # Any-Bit-Adder
