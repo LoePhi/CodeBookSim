@@ -5,10 +5,16 @@ import inspect
 from functools import wraps
 
 
+use_slots = True
+
+
 class ElectricElement():
     """
     Parent class for all components of the electric circuit
     """
+
+    if use_slots:
+        __slots__ = ()
 
     def __init__(self) -> None:
         raise NotImplementedError
@@ -102,6 +108,9 @@ class CoreComponent(ElectricElement):
     called 'out_main'
     """
 
+    if use_slots:
+        __slots__ = ('out_main', 'forward_connections')
+
     out_main: bool
 
     def compute_state(self) -> None:
@@ -153,6 +162,9 @@ class LooseWire(CoreComponent):
     It never carries a current
     """
 
+    if use_slots:
+        __slots__ = ()
+
     def __init__(self) -> None:
         self.setup()
 
@@ -164,6 +176,9 @@ class LooseWire(CoreComponent):
 
 
 class _LWSent(LooseWire):
+
+    if use_slots:
+        __slots__ = ()
 
     def __init__(self) -> None:
         pass
@@ -259,8 +274,9 @@ class CombinedCircuit(ElectricElement):
     Parent class for componenets that are assembled from
     other components
     """
-
-    pass
+    if use_slots:
+        __slots__ = ()
+    ...
 
 
 class SingleOutCircuit(CombinedCircuit):
@@ -268,6 +284,9 @@ class SingleOutCircuit(CombinedCircuit):
     Parent for all combined circuits with a a single
     output of any size
     """
+    if use_slots:
+        __slots__ = ()
+    ...
 
 
 class SingleBitSOC(SingleOutCircuit):
@@ -287,6 +306,9 @@ class SingleBitSOC(SingleOutCircuit):
     can be written as if XOR were a CoreComponent
     and1.connect_input('in_b', xor1)
     """
+
+    if use_slots:
+        __slots__ = ('out_main')
 
     out_main: Union[CoreComponent, 'SingleBitSOC']
 
@@ -316,6 +338,9 @@ class MultiBitSOC(SingleOutCircuit):
     Parent class for all circuits that have
     a single multibit output
     """
+    if use_slots:
+        __slots__ = ('out_main')
+
     out_main: Sequence[InputComponent]
 
     def __str__(self) -> str:
@@ -342,14 +367,16 @@ class MultiOutCircuit(CombinedCircuit):
     have to be adressed by naming their outputs
     (e.g. x = HalfAdder(a,b); y = Halfadder(c,x.carry))
     """
-    pass
+    if use_slots:
+        __slots__ = ()
 
 
 class Monitor(ElectricElement):
     """
     Parent class for all output devices
     """
-    pass
+    if use_slots:
+        __slots__ = ()
 
     def update(self) -> None:
         raise NotImplementedError

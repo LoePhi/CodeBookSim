@@ -31,7 +31,7 @@ class RSFlipFlop(SingleBitSOC):
 
         self.out_main = self.out_q
 
-    def __str__(self, full: bool = False) -> str:
+    def fullstr(self, full: bool = True) -> str:
         if full:
             if not (self.out_q.is_on + self.out_qb.is_on) == 1:
                 raise ValueError("Bad Innput to RS-FlipFlop")
@@ -58,7 +58,7 @@ class LevelTrigDTFlipFlop(SingleBitSOC):
 
         self.out_main = self.out_q
 
-    def __str__(self, full: bool = False) -> str:
+    def fullstr(self, full: bool = True) -> str:
         if full:
             return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
         else:
@@ -86,7 +86,7 @@ class LevelTrigDTFlipFlopCl(SingleBitSOC):
 
         self.out_main = self.out_q
 
-    def __str__(self, full: bool = False) -> str:
+    def fullstr(self, full: bool = True) -> str:
         if full:
             return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
         else:
@@ -111,7 +111,7 @@ class EdgeTrigDTFlipFlop(SingleBitSOC):
 
         self.out_main = self.out_q
 
-    def __str__(self, full: bool = False) -> str:
+    def fullstr(self, full: bool = True) -> str:
         if full:
             return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
         else:
@@ -151,7 +151,7 @@ class EdgeTrigDTFlipFlopPreCl(SingleBitSOC):
 
         self.out_main = self.out_q
 
-    def __str__(self, full: bool = False) -> str:
+    def fullstr(self, full: bool = True) -> str:
         if full:
             return str(int(self.out_q.is_on)) + str(int(self.out_qb.is_on))
         else:
@@ -267,7 +267,7 @@ class RAM_64K_1(SingleBitSOC):
     @autoparse
     def __init__(self,
                  in_data: InputComponent = no_con(),
-                 in_select: Sequence[InputComponent] = no_con(4),
+                 in_select: Sequence[InputComponent] = no_con(16),
                  in_write: InputComponent = no_con()) -> None:
 
         self.in_data = in_data
@@ -279,3 +279,21 @@ class RAM_64K_1(SingleBitSOC):
         self.sel = Selector_64K_1(self.latches, self.in_select)
 
         self.out_main = self.sel
+
+
+class RAM_64K_8(MultiBitSOC):
+
+    @autoparse
+    def __init__(self,
+                 in_data: Sequence[InputComponent] = no_con(8),
+                 in_select: Sequence[InputComponent] = no_con(4),
+                 in_write: InputComponent = no_con()) -> None:
+
+        self.in_data = in_data
+        self.in_select = in_select
+        self.in_write = in_write
+
+        self.rams = [RAM_64K_1(self.in_data[i], self.in_select, self.in_write)
+                     for i in range(8)]
+
+        self.out_main = self.rams

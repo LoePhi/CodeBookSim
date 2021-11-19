@@ -1,5 +1,5 @@
 from switchsimulator.base import _LWSent, CoreComponent, LooseWire
-from switchsimulator.base import autoparse, no_con, InputComponent
+from switchsimulator.base import autoparse, no_con, InputComponent, use_slots
 
 
 class Switch(CoreComponent):
@@ -7,6 +7,9 @@ class Switch(CoreComponent):
     Simple Switch. It is used to control a gate.
     When the gate is closed it carries a current.
     """
+
+    if use_slots:
+        __slots__ = ()
 
     def __init__(self, closed: bool = False) -> None:
         self.out_main = closed
@@ -34,6 +37,9 @@ class Switch(CoreComponent):
 class INV(CoreComponent):
     """Inverts the input"""
 
+    if use_slots:
+        __slots__ = ('in_a',)
+
     @autoparse
     def __init__(self,
                  in_a: InputComponent = no_con()) -> None:
@@ -54,6 +60,9 @@ class BaseGate(CoreComponent):
     Parent for the baisc logic gates
     """
 
+    if use_slots:
+        __slots__ = ('in_a', 'in_b')
+
     # no @autoparse for speed reasons
     def __init__(self,
                  in_a: InputComponent = _LWSent(),
@@ -71,6 +80,9 @@ class BaseGate(CoreComponent):
 class AND(BaseGate):
     """AND-Gate"""
 
+    if use_slots:
+        __slots__ = ()
+
     def compute_state(self) -> None:
         self.out_main = False
         if self.in_a.is_on:
@@ -80,6 +92,8 @@ class AND(BaseGate):
 
 class OR(BaseGate):
     """OR-Gate"""
+    if use_slots:
+        __slots__ = ()
 
     def compute_state(self) -> None:
         self.out_main = False
@@ -91,6 +105,8 @@ class OR(BaseGate):
 
 class NOR(BaseGate):
     """NOR-Gate"""
+    if use_slots:
+        __slots__ = ()
 
     def compute_state(self) -> None:
         self.out_main = True
@@ -102,6 +118,8 @@ class NOR(BaseGate):
 
 class NAND(BaseGate):
     """NAND-Gate"""
+    if use_slots:
+        __slots__ = ()
 
     def compute_state(self) -> None:
         self.out_main = True

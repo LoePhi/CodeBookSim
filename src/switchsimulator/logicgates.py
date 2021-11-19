@@ -70,7 +70,9 @@ class OR8(SingleBitSOC):
 
 
 class ANDX(SingleBitSOC):
-    """General AND-Gate. Does not support delayed connections"""
+    """General AND-Gate. Does not support delayed connections
+    Can become problematioc for large inputs because of the
+    reduce chain"""
 
     def __init__(self, in_data: Sequence[InputComponent]) -> None:
         self.in_data = in_data
@@ -81,7 +83,7 @@ class ANDX(SingleBitSOC):
 class AND17(SingleBitSOC):
     """General AND-Gate. Does not support delayed connections"""
 
-    def __init__(self, in_data: Sequence[InputComponent]) -> None:
+    def __init__(self, in_data: Sequence[InputComponent] = no_con(17)) -> None:
         self.in_data = in_data
 
         and1 = AND4(*in_data[:4])
@@ -95,8 +97,10 @@ class AND17(SingleBitSOC):
 class ORX(SingleBitSOC):
     """
     General OR-Gate. Does not support delayed connections
-    Can become problematioc for large inputs because of the
-    reduce chain
+    This should be faster if high memory adressses are never
+    accessed.
+    However, if they are accessed it can become unstable
+    because of the reduce chain.
     """
 
     def __init__(self, in_data: Sequence[InputComponent]) -> None:
