@@ -1,21 +1,6 @@
 # type: ignore
 
-import sys
-print(1)
+from switchsimulator.corecomponents import AND, Switch
 
-
-class B:
-    pass
-
-
-class A(B):
-    __slots__ = ('a')
-
-    def __init__(self, a) -> None:
-        self.a = a
-        self.b = 3
-
-
-A(2)
-
-sys.getsizeof(A(2))
+s1 = Switch(True)
+and1 = AND(s1)

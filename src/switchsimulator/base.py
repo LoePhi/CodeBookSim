@@ -22,40 +22,43 @@ class ElectricElement():
     # type cheat
     # add_connection ist hier nur, weil
     # connect_input sich sonst beschwert
-    # -> connect_input in kinder packen, aber die
-    # gleich bleibenden elemente wieder hier hoch verlagern
-    def add_connection(self, con: 'CoreComponent', port: str) -> None:
+    def add_connection(self,
+                       con: Union['CoreComponent', 'Monitor'],
+                       port: str) -> None:
         raise NotImplementedError
 
     def get_state(self) -> bool:
         raise NotImplementedError
 
+    def _connect_single_input(self,
+                              component: 'InputComponent',
+                              old_input: 'LooseWire') -> None:
+        for fc in old_input.forward_connections:
+            setattr(fc[0], fc[1], component)
+            component.add_connection(fc[0], fc[1])
+            fc[0].update()
+
     def connect_input(self,
                       port: str,
-                      component: Union['ElectricElement',
-                                       Sequence['ElectricElement']]) -> None:
+                      component: Union['InputComponent',
+                                       Sequence['InputComponent']]) -> None:
         """
         Should be used if not all inputs were available at initialization
+        Reconnecting of existing components is not supported and may lead
+        to unexpected behaviour
         """
 
         old_input = getattr(self, port)
-        old_input = old_input if isinstance(
-            old_input, Iterable) else [old_input]
 
         if not isinstance(component, Iterable):
-            component = [component]
+            self._connect_single_input(component, old_input)
+        else:
+            if len(old_input) != len(component):
+                raise ValueError("New input has wrong size")
 
-        if len(old_input) != len(component):
-            raise ValueError("New input has wrong size")
+            for i in range(len(component)):
+                self._connect_single_input(component[i], old_input[i])
 
-        for i in range(len(component)):
-            for fc in old_input[i].forward_connections:
-                setattr(fc[0], fc[1], component[i])
-                component[i].add_connection(fc[0], fc[1])
-                fc[0].update()
-
-        # Not functional, just for tracking
-        component = component[0] if len(component) == 1 else component
         setattr(self, port, component)
 
     @staticmethod
@@ -135,11 +138,6 @@ class CoreComponent(ElectricElement):
                        con: Union['CoreComponent', 'Monitor'],
                        port: str) -> None:
         """Called by downstream elements to add them as a forward connection"""
-        # TODO: think about whether to place this check
-        # somwhere else or if it is even needed. Here, it
-        # makes construction awfully slow for large amounts
-        # of forward_connections
-        # if (con, port) not in self.forward_connections:
         self.forward_connections.append((con, port))
 
     def forward_pass(self) -> None:
@@ -198,7 +196,7 @@ def no_con(n: Optional[int] = None) -> Union[
         _LWSent, List[_LWSent]]:
     """
     ONLY for use with the @autoparse decorator.
-    LooseWires are temporary and will be exchanged by the decorator.
+    Generates Sentinels that are exchanged for LooseWires by the decorator.
     """
     if n is None:
         return _LWSent()
@@ -326,9 +324,9 @@ class SingleBitSOC(SingleOutCircuit):
         return str(int(self.out_main.is_on))
 
 
-# Only CoreComponents and SinglestateSC can be used as
-# directly inputs. Secondary components have to be adressed
-# by there their ports, which are are also either CoreComponents
+# Only CoreComponents and SinglestateSC can be used directly
+# as inputs. Secondary components have to be adressed
+# by their ports, which are are also either CoreComponents
 # or SinglestateSC
 InputComponent = Union[CoreComponent, SingleBitSOC]
 

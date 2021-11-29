@@ -16,9 +16,9 @@ import tracemalloc
 
 # cProfile.run("Selector_64K_1()")
 
-cProfile.run("RAM_64K_1(Switch(True), bts('0000000000000000'), Switch(True))")
+#cProfile.run("RAM_64K_1(Switch(True), bts('0000000000000000'), Switch(True))")
 
-cProfile.run("RAM_64K_8(bts('01010101'), bts('0000000000000000'), Switch(True))")
+#cProfile.run("RAM_64K_8(bts('01010101'), bts('0000000000000000'), Switch(True))")
 
 tracemalloc.start()
 
