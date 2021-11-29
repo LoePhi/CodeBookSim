@@ -25,8 +25,6 @@ tracemalloc.start()
 _ = RAM_64K_1(Switch(True), bts('0000000000000000'), Switch(True))
 
 snapshot = tracemalloc.take_snapshot()
-top_stats = snapshot.statistics('lineno')
-
-print("[ Top 10 ]")
-for stat in top_stats[:10]:
+stats = snapshot.statistics('lineno')
+for stat in stats[:20]:
     print(stat)

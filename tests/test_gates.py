@@ -1,6 +1,7 @@
 import pytest
 from switchsimulator.corecomponents import Switch, INV, AND, OR, NOR, NAND
-from switchsimulator.logicgates import ANDX, XOR, NOR3, OR8, AND4
+from switchsimulator.logicgates import XOR, NOR3, OR8, AND4
+from switchsimulator.logicgates import AND17, ANDX, OR64K, ORX
 from switchsimulator.helpers import bts
 
 
@@ -196,9 +197,53 @@ def test_or8():
 
 def test_and17():
     x = bts('01111111111111101')
+    y = AND17(x)
+    assert not y.is_on
+    x[0].flip()
+    assert not y.is_on
+    x[15].flip()
+    assert y.is_on
+
+
+def test_andx():
+    x = bts('01111111111111101')
     y = ANDX(x)
     assert not y.is_on
     x[0].flip()
     assert not y.is_on
     x[15].flip()
     assert y.is_on
+
+
+def test_orx():
+    x = bts('000000000000000000000')
+    y = ORX(x)
+    assert not y.is_on
+    x[0].flip()
+    assert y.is_on
+    x[0].flip()
+    x[10].flip()
+    assert y.is_on
+    x[10].flip()
+    assert not y.is_on
+    x[-1].flip()
+    assert y.is_on
+    x[-1].flip()
+    assert not y.is_on
+
+
+def test_or64k():
+    x = bts('0'*(2**16))
+    y = OR64K(x)
+    assert not y.is_on
+    x[0].flip()
+    assert y.is_on
+    x[0].flip()
+    x[10].flip()
+    assert y.is_on
+    x[10].flip()
+    assert not y.is_on
+    x[-1].flip()
+    assert y.is_on
+    x[-1].flip()
+    assert not y.is_on

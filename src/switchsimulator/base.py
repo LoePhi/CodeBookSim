@@ -5,7 +5,7 @@ import inspect
 from functools import wraps
 
 
-use_slots = True
+use_slots = False
 
 
 class ElectricElement():
