@@ -2,4 +2,4 @@ __pychache__/
 .vscode/
 *.pyc
 *.egg-info/
-switchsimulator/tmp.py
+src/switchsimulator/tmp.py
