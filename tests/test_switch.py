@@ -1,4 +1,4 @@
-from switchsimulator.corecomponents import Switch
+from codebooksim.corecomponents import Switch
 
 
 def test_a():

@@ -1,7 +1,7 @@
-from switchsimulator.corecomponents import Switch
-from switchsimulator.adders import Adder, AddingMachine2, HalfAdder, FullAdder
-from switchsimulator.adders import Eight_Bit_Adder, Sixteen_Bit_Adder, AddMin
-from switchsimulator.helpers import bts
+from codebooksim.corecomponents import Switch
+from codebooksim.adders import Adder, AddingMachine2, HalfAdder, FullAdder
+from codebooksim.adders import Eight_Bit_Adder, Sixteen_Bit_Adder, AddMin
+from codebooksim.helpers import bts
 
 s1 = Switch(True)
 s2 = Switch(True)

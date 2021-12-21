@@ -1,7 +1,7 @@
-from switchsimulator.corecomponents import Switch
-from switchsimulator.misccomp import Decoder_1_2, Decoder_3_8, OnesComplement
-from switchsimulator.misccomp import Selector_2_1, Selector_8_1
-from switchsimulator.helpers import bts
+from codebooksim.corecomponents import Switch
+from codebooksim.misccomp import Decoder_1_2, Decoder_3_8, OnesComplement
+from codebooksim.misccomp import Selector_2_1, Selector_8_1
+from codebooksim.helpers import bts
 
 
 def test_ones_complement():

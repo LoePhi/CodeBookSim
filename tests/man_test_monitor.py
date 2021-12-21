@@ -1,8 +1,8 @@
-from switchsimulator.corecomponents import Switch
-from switchsimulator.monitor import Lightbulbs
-from switchsimulator.clocks import clock, RippleCounter
-from switchsimulator.adders import AddingMachine2
-from switchsimulator.helpers import bts
+from codebooksim.corecomponents import Switch
+from codebooksim.monitor import Lightbulbs
+from codebooksim.clocks import clock, RippleCounter
+from codebooksim.adders import AddingMachine2
+from codebooksim.helpers import bts
 import threading
 from time import sleep
 

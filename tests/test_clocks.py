@@ -1,5 +1,5 @@
-from switchsimulator.corecomponents import Switch
-from switchsimulator.clocks import clock, book_oscillator, RippleCounter
+from codebooksim.corecomponents import Switch
+from codebooksim.clocks import clock, book_oscillator, RippleCounter
 import threading
 from time import sleep
 

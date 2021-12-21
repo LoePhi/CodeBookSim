@@ -1,11 +1,11 @@
 import pytest
-from switchsimulator.corecomponents import Switch
-from switchsimulator.memory import RAM_16_1, RAM_8_1, RAM_8_2
-from switchsimulator.memory import EdgeTrig8BitLatchPreCl, RSFlipFlop
-from switchsimulator.memory import LevelTrigDTFlipFlop, LevelTrigDTFlipFlopCl
-from switchsimulator.memory import EdgeTrigDTFlipFlop, EdgeTrigDTFlipFlopPreCl
-from switchsimulator.memory import LevelTrig8BitLatch
-from switchsimulator.helpers import bts
+from codebooksim.corecomponents import Switch
+from codebooksim.memory import RAM_16_1, RAM_8_1, RAM_8_2
+from codebooksim.memory import EdgeTrig8BitLatchPreCl, RSFlipFlop
+from codebooksim.memory import LevelTrigDTFlipFlop, LevelTrigDTFlipFlopCl
+from codebooksim.memory import EdgeTrigDTFlipFlop, EdgeTrigDTFlipFlopPreCl
+from codebooksim.memory import LevelTrig8BitLatch
+from codebooksim.helpers import bts
 
 
 def test_rs_flipflop():

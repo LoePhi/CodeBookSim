@@ -1,6 +1,6 @@
-from switchsimulator.memory import RAM_64K_1, RAM_64K_8
-from switchsimulator.corecomponents import Switch
-from switchsimulator.helpers import bts
+from codebooksim.memory import RAM_64K_1, RAM_64K_8
+from codebooksim.corecomponents import Switch
+from codebooksim.helpers import bts
 
 
 def test_ram_64k_1():

@@ -1,10 +1,10 @@
 # flake8: noqa
 import cProfile
-from switchsimulator.corecomponents import Switch
-from switchsimulator.adders import Sixteen_Bit_Adder
-from switchsimulator.helpers import bts
-from switchsimulator.misccomp import Decoder_16_64K, Selector_64K_1
-from switchsimulator.memory import RAM_64K_1, RAM_64K_8
+from codebooksim.corecomponents import Switch
+from codebooksim.adders import Sixteen_Bit_Adder
+from codebooksim.helpers import bts
+from codebooksim.misccomp import Decoder_16_64K, Selector_64K_1
+from codebooksim.memory import RAM_64K_1, RAM_64K_8
 import tracemalloc
 
 

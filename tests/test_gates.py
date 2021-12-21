@@ -1,8 +1,8 @@
 import pytest
-from switchsimulator.corecomponents import Switch, INV, AND, OR, NOR, NAND
-from switchsimulator.logicgates import XOR, NOR3, OR8, AND4
-from switchsimulator.logicgates import AND17, ANDX, OR64K, ORX
-from switchsimulator.helpers import bts
+from codebooksim.corecomponents import Switch, INV, AND, OR, NOR, NAND
+from codebooksim.logicgates import XOR, NOR3, OR8, AND4
+from codebooksim.logicgates import AND17, ANDX, OR64K, ORX
+from codebooksim.helpers import bts
 
 
 s1 = Switch(True)
