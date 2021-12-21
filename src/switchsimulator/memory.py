@@ -286,7 +286,7 @@ class RAM_64K_8(MultiBitSOC):
     @autoparse
     def __init__(self,
                  in_data: Sequence[InputComponent] = no_con(8),
-                 in_select: Sequence[InputComponent] = no_con(4),
+                 in_select: Sequence[InputComponent] = no_con(16),
                  in_write: InputComponent = no_con()) -> None:
 
         self.in_data = in_data

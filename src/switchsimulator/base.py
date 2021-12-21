@@ -324,17 +324,15 @@ class SingleBitSOC(SingleOutCircuit):
         return str(int(self.out_main.is_on))
 
 
-# Only CoreComponents and SinglestateSC can be used directly
-# as inputs. Secondary components have to be adressed
-# by their ports, which are are also either CoreComponents
-# or SinglestateSC
+# Only CoreComponents and SingleBitSOC can be used directly
+# as inputs.
 InputComponent = Union[CoreComponent, SingleBitSOC]
 
 
 class MultiBitSOC(SingleOutCircuit):
     """
     Parent class for all circuits that have
-    a single multibit output
+    a single multibit output 'out_main'
     """
     if use_slots:
         __slots__ = ('out_main')
@@ -359,7 +357,7 @@ class MultiBitSOC(SingleOutCircuit):
 class MultiOutCircuit(CombinedCircuit):
     """
     Parent class for all circuits that have
-    multiple output (== adders)
+    multiple outputs (like adders)
 
     When using these circuits as inputs, they
     have to be adressed by naming their outputs
